@@ -1,5 +1,13 @@
-#include "application/application.h"
+#include "application.h"
+#include "gpu.h"
 #pragma comment(linker, "/subsystem:console /entry:wWinMainCRTStartup")
+
+void render()
+{
+	sgl->clear();
+	for(uint32_t i = 0; i < app->getWidth(); ++i)
+		sgl->drawPoint(i, 200, RGBA(255, 255, 255));
+}
 
 int APIENTRY wWinMain(
 	_In_ HINSTANCE hInstance,		
@@ -12,11 +20,15 @@ int APIENTRY wWinMain(
 		return -1;
 	}
 
+	sgl->initSurface(800, 600, app->getCanvas());
 
 	while (true)
 	{
 		if (!app->peekMessage())
 			break;
+
+		render();
+		app->show();
 	}
 
 	return 0;

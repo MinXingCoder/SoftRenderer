@@ -15,6 +15,14 @@ public:
 
 	bool peekMessage();
 
+	void show();
+
+	uint32_t getWidth() const;
+
+	uint32_t getHeight() const;
+
+	void* getCanvas() const;
+
 private:
 	BOOL createWindow(HINSTANCE hInstance);
 
@@ -34,4 +42,12 @@ private:
 	uint32_t mWidth{ 800 };
 
 	uint32_t mHeight{ 600 };
+
+	HDC mhDC;
+
+	HDC mCanvasDC;
+
+	HBITMAP mhBmp;
+
+	void* mCanvasBuffer{ nullptr };
 };

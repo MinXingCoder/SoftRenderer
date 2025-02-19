@@ -25,10 +25,37 @@ bool Application::initApplication(HINSTANCE hInstance, const uint32_t& width, co
 	mWidth = width;
 	mHeight = height;
 
+	// 0 ±Ì æ error
 	if (0 == registerWindowClass(hInstance))
 		return false;
 
-	return createWindow(hInstance);
+	if (!createWindow(hInstance))
+		return false;
+
+	mhDC = GetDC(mHwnd);
+
+	mCanvasDC = CreateCompatibleDC(mhDC);
+
+	BITMAPINFO bmpInfo{};
+	bmpInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+	bmpInfo.bmiHeader.biWidth = mWidth;
+	bmpInfo.bmiHeader.biHeight = mHeight;
+	bmpInfo.bmiHeader.biPlanes = 1;
+	bmpInfo.bmiHeader.biBitCount = 32;
+	bmpInfo.bmiHeader.biCompression = BI_RGB;
+
+	mhBmp = CreateDIBSection(
+		mCanvasDC,
+		&bmpInfo,
+		DIB_RGB_COLORS,
+		(void**)&mCanvasBuffer,
+		0, 0);
+
+	SelectObject(mCanvasDC, mhBmp);
+
+	memset(mCanvasBuffer, 0, mWidth * mHeight * 4);
+
+	return true;
 }
 
 BOOL Application::createWindow(HINSTANCE hInstance)
@@ -125,4 +152,24 @@ bool Application::peekMessage()
 		DispatchMessage(&msg);
 	}
 	return mAlive;
+}
+
+void Application::show()
+{
+	BitBlt(mhDC, 0, 0, mWidth, mHeight, mCanvasDC, 0, 0, SRCCOPY);
+}
+
+uint32_t Application::getWidth() const
+{
+	return mWidth;
+}
+
+uint32_t Application::getHeight() const
+{
+	return mHeight;
+}
+
+void* Application::getCanvas() const
+{
+	return reinterpret_cast<void*>(mCanvasBuffer);
 }
