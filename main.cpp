@@ -5,8 +5,10 @@
 void render()
 {
 	sgl->clear();
-	for(uint32_t i = 0; i < app->getWidth(); ++i)
-		sgl->drawPoint(i, 200, RGBA(255, 255, 255));
+	// for(uint32_t i = 0; i < app->getWidth(); ++i)
+	// 	sgl->drawPoint(i, 200, RGBA(255, 255, 255));
+	sgl->drawLine(0, 0, 200, 500, RGBA(255, 255, 255));
+	sgl->drawLine(0, 0, 500, 200, RGBA(255, 255, 255));
 }
 
 int APIENTRY wWinMain(

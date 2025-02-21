@@ -1,4 +1,5 @@
 #include "application.h"
+#include "base.h"
 #include <windef.h>
 
 LRESULT CALLBACK Wndproc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -53,7 +54,7 @@ bool Application::initApplication(HINSTANCE hInstance, const uint32_t& width, co
 
 	SelectObject(mCanvasDC, mhBmp);
 
-	memset(mCanvasBuffer, 0, mWidth * mHeight * 4);
+	memset(mCanvasBuffer, 0, mWidth * mHeight * sizeof(RGBA));
 
 	return true;
 }
