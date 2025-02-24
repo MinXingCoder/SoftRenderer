@@ -1,14 +1,24 @@
 #include "application.h"
 #include "gpu.h"
+#include <cmath>
 #pragma comment(linker, "/subsystem:console /entry:wWinMainCRTStartup")
 
 void render()
 {
 	sgl->clear();
-	// for(uint32_t i = 0; i < app->getWidth(); ++i)
-	// 	sgl->drawPoint(i, 200, RGBA(255, 255, 255));
-	sgl->drawLine(0, 0, 200, 500, RGBA(255, 255, 255));
-	sgl->drawLine(0, 0, 500, 200, RGBA(255, 255, 255));
+
+	int r = 150;
+	Point c{ 400, 300, RGBA(255, 0, 0, 255) };
+	for (float i = 0; i < 360; i += 10)
+	{
+		float radian = DEG2RAD(i);
+		int x = r * std::sin(radian) + c.x;
+		int y = r * std::cos(radian) + c.y;
+
+		Point pt{ x, y, RGBA(std::rand() % 255, std::rand() % 255, std::rand() % 255, 255) };
+
+		sgl->drawLine(c, pt);
+	}
 }
 
 int APIENTRY wWinMain(

@@ -1,6 +1,7 @@
 #include "gpu.h"
 #include <string.h>
 #include <algorithm>
+#include "raster.h"
 
 GPU* GPU::mInstance = nullptr;
 
@@ -39,40 +40,20 @@ void GPU::clear()
 
 void GPU::drawPoint(uint32_t x, uint32_t y, const RGBA& color)
 {
-	mFrameBuffer->mColorBuffer[x + y * mFrameBuffer->mWidth] = color;
+	if (x >= mFrameBuffer->mWidth || y >= mFrameBuffer->mHeight) return;
+	uint32_t pixelPos = x + y * mFrameBuffer->mWidth;
+	mFrameBuffer->mColorBuffer[pixelPos] = color;
 }
 
-void GPU::drawLine(uint32_t x0, uint32_t y0, uint32_t x1, uint32_t y1, const RGBA& color)
+void GPU::drawLine(const Point& v0, const Point& v1)
 {
-	uint32_t deltaX = x1 - x0, deltaY = y1 - y0;
-	if (deltaY > deltaX) {
-		drawLineImpl(y0, x0, y1, x1, color, false);
-	}
-	else {
-		drawLineImpl(x0, y0, x1, y1, color, true);
-	}
-}
+	std::vector<Point> pixels;
 
-void GPU::drawLineImpl(uint32_t x0, uint32_t y0, uint32_t x1, uint32_t y1, const RGBA& color, bool flag)
-{
-	uint32_t x = x0, y = y0, deltaX = x1 - x0, deltaY = y1 - y0;
-	int p = 2 * deltaY - deltaX;
+	Raster::rasterizeLine(pixels, v0, v1);
 
-	while (x < x1) 
+	for (auto& item : pixels)
 	{
-		if (flag) drawPoint(x, y, color);
-		else drawPoint(y, x, color);
-
-		++x;
-
-		if (p >= 0) 
-		{
-			y = y + 1;
-			p = p - 2 * deltaX;
-		}
-		p = p + 2 * deltaY;
+		Raster::interpolantLine(v0, v1, item);
+		drawPoint(item.x, item.y, item.color);
 	}
-
-	if (flag) drawPoint(x, y, color);
-	else drawPoint(y, x, color);
 }

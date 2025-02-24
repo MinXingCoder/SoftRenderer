@@ -1,4 +1,5 @@
 #pragma once
+#include <stdint.h>
 
 #define PI 3.1415926
 #define DEG2RAD(theta) (theta * 0.01745329251994)
@@ -20,4 +21,11 @@ struct RGBA
 		, mR(r)
 		, mA(a)
 	{}
+};
+
+struct Point
+{
+	int32_t x;
+	int32_t y;
+	RGBA color;
 };
