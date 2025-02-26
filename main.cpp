@@ -7,18 +7,24 @@ void render()
 {
 	sgl->clear();
 
-	int r = 150;
-	Point c{ 400, 300, RGBA(255, 0, 0, 255) };
-	for (float i = 0; i < 360; i += 10)
-	{
-		float radian = DEG2RAD(i);
-		int x = r * std::sin(radian) + c.x;
-		int y = r * std::cos(radian) + c.y;
+	//int r = 150;
+	//Point c{ 400, 300, RGBA(255, 0, 0, 255) };
+	//for (float i = 0; i < 360; i += 10)
+	//{
+	//	float radian = DEG2RAD(i);
+	//	int x = r * std::sin(radian) + c.x;
+	//	int y = r * std::cos(radian) + c.y;
 
-		Point pt{ x, y, RGBA(std::rand() % 255, std::rand() % 255, std::rand() % 255, 255) };
+	//	Point pt{ x, y, RGBA(std::rand() % 255, std::rand() % 255, std::rand() % 255, 255) };
 
-		sgl->drawLine(c, pt);
-	}
+	//	sgl->drawLine(c, pt);
+	//}
+
+	Point p1{ 0, 100, RGBA(255, 255, 255, 255) };
+	Point p2{ 500, 100, RGBA(255, 255, 255, 255) };
+	Point p3{ 250, 500, RGBA(255, 255, 255, 255) };
+
+	sgl->drawTriangle(p1, p2, p3);
 }
 
 int APIENTRY wWinMain(

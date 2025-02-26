@@ -16,6 +16,7 @@ public:
 	void clear();
 	void drawPoint(uint32_t x, uint32_t y, const RGBA& color);
 	void drawLine(const Point& v0, const Point& v1);
+	void drawTriangle(const Point& p1, const Point& p2, const Point& p3);
 
 private:
 
