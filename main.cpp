@@ -2,7 +2,7 @@
 #include "gpu.h"
 #include <cmath>
 #pragma comment(linker, "/subsystem:console /entry:wWinMainCRTStartup")
-
+Image* img = Image::createImage(".\\assets\\textures\\zhaohua.jpg");
 void render()
 {
 	sgl->clear();
@@ -20,11 +20,14 @@ void render()
 	//	sgl->drawLine(c, pt);
 	//}
 
-	Point p1{ 0, 100, RGBA(255, 255, 255, 255) };
-	Point p2{ 500, 100, RGBA(255, 255, 255, 255) };
-	Point p3{ 250, 500, RGBA(255, 255, 255, 255) };
+	//Point p1{ 0, 100, RGBA(255, 0, 0, 255) };
+	//Point p2{ 500, 100, RGBA(0, 255, 0, 255) };
+	//Point p3{ 250, 500, RGBA(0, 0, 255, 255) };
 
-	sgl->drawTriangle(p1, p2, p3);
+	//sgl->drawTriangle(p1, p2, p3);
+	
+	sgl->drawImage(img);
+	//Image::destroy(img);
 }
 
 int APIENTRY wWinMain(

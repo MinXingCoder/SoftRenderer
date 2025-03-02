@@ -105,8 +105,30 @@ void Raster::rasterizeTriangle(std::vector<Point>& results, const Point& v0, con
 			if (bNegative || bPositive)
 			{
 				tmp.x = i, tmp.y = j, tmp.color = RGBA();
+				interpolantTriangle(v0, v1, v2, tmp);
 				results.emplace_back(tmp);
 			}
 		}
 	}
+}
+
+void Raster::interpolantTriangle(const Point& v0, const Point& v1, const Point& v2, Point& target)
+{
+	math::vec2f ab(v1.x - v0.x, v1.y - v0.y), ac(v2.x - v0.x, v2.y - v0.y);
+	float abc = std::abs(math::cross(ab, ac));
+	math::vec2f pb(v1.x - target.x, v1.y - target.y), pc(v2.x - target.x, v2.y - target.y);
+	float bpc = std::abs(math::cross(pb, pc));
+	float alpha = bpc / abc;
+
+	math::vec2f pa(v0.x - target.x, v0.y - target.y);
+	float apc = std::abs(math::cross(pa, pc));
+	float beta = apc / abc;
+
+	float apb = std::abs(math::cross(pa, pb));
+	float gamma = apb / abc;
+
+	target.color.mR = v0.color.mR * alpha + v1.color.mR * beta + v2.color.mR * gamma;
+	target.color.mG = v0.color.mG * alpha + v1.color.mG * beta + v2.color.mG * gamma;
+	target.color.mB = v0.color.mB * alpha + v1.color.mB * beta + v2.color.mB * gamma;
+	target.color.mA = v0.color.mA * alpha + v1.color.mA * beta + v2.color.mA * gamma;
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include "framebuffer.h"
 #include "base.h"
+#include "../application/image.h"
 
 #define sgl GPU::getInstance()
 
@@ -17,6 +18,7 @@ public:
 	void drawPoint(uint32_t x, uint32_t y, const RGBA& color);
 	void drawLine(const Point& v0, const Point& v1);
 	void drawTriangle(const Point& p1, const Point& p2, const Point& p3);
+	void drawImage(const Image* image);
 
 private:
 

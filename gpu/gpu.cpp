@@ -69,3 +69,21 @@ void GPU::drawTriangle(const Point& p1, const Point& p2, const Point& p3)
 		drawPoint(item.x, item.y, item.color);
 	}
 }
+
+void GPU::drawImage(const Image* image)
+{
+	//for (int i = 0; i < image->mHeight; ++i)
+	//{
+	//	for (int j = 0; j < image->mWidth; ++j)
+	//	{
+	//		drawPoint(j, i, image->mData[i * image->mWidth + j]);
+	//	}
+	//}
+	for (uint32_t i = 0; i < image->mWidth; ++i)
+	{
+		for (uint32_t j = 0; j < image->mHeight; ++j)
+		{
+			drawPoint(i, j, image->mData[j * image->mWidth + i]);
+		}
+	}
+}
