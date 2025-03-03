@@ -2,7 +2,8 @@
 #include "gpu.h"
 #include <cmath>
 #pragma comment(linker, "/subsystem:console /entry:wWinMainCRTStartup")
-Image* img = Image::createImage(".\\assets\\textures\\zhaohua.jpg");
+Image* img0 = Image::createImage(".\\assets\\textures\\zhaohua.jpg");
+Image* img1 = Image::createImage(".\\assets\\textures\\house.jpg");
 void render()
 {
 	sgl->clear();
@@ -25,8 +26,9 @@ void render()
 	//Point p3{ 250, 500, RGBA(0, 0, 255, 255) };
 
 	//sgl->drawTriangle(p1, p2, p3);
-	
-	sgl->drawImage(img);
+	sgl->SetBlending(true);
+	sgl->drawImage(img1);
+	sgl->drawImageWithAlpha(img0, 100);
 	//Image::destroy(img);
 }
 

@@ -19,9 +19,13 @@ public:
 	void drawLine(const Point& v0, const Point& v1);
 	void drawTriangle(const Point& p1, const Point& p2, const Point& p3);
 	void drawImage(const Image* image);
+	void drawImageWithAlpha(const Image* image, const uint32_t& alpha);
+
+	void SetBlending(bool enable);
 
 private:
 
 	static GPU* mInstance;
 	FrameBuffer* mFrameBuffer{ nullptr };
+	bool mEnableBlending{ false };
 };

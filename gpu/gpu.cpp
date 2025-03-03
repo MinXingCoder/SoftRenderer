@@ -42,7 +42,20 @@ void GPU::drawPoint(uint32_t x, uint32_t y, const RGBA& color)
 {
 	if (x >= mFrameBuffer->mWidth || y >= mFrameBuffer->mHeight) return;
 	uint32_t pixelPos = x + y * mFrameBuffer->mWidth;
-	mFrameBuffer->mColorBuffer[pixelPos] = color;
+
+	RGBA result = color;
+
+	if (mEnableBlending)
+	{
+		float weight = color.mA / 255.0f;
+		auto dst = mFrameBuffer->mColorBuffer[pixelPos];
+		result.mR = result.mR * weight + dst.mR * (1 - weight);
+		result.mG = result.mG * weight + dst.mG * (1 - weight);
+		result.mB = result.mB * weight + dst.mB * (1 - weight);
+		result.mA = result.mA * weight + dst.mA * (1 - weight);
+	}
+
+	mFrameBuffer->mColorBuffer[pixelPos] = result;
 }
 
 void GPU::drawLine(const Point& v0, const Point& v1)
@@ -72,13 +85,6 @@ void GPU::drawTriangle(const Point& p1, const Point& p2, const Point& p3)
 
 void GPU::drawImage(const Image* image)
 {
-	//for (int i = 0; i < image->mHeight; ++i)
-	//{
-	//	for (int j = 0; j < image->mWidth; ++j)
-	//	{
-	//		drawPoint(j, i, image->mData[i * image->mWidth + j]);
-	//	}
-	//}
 	for (uint32_t i = 0; i < image->mWidth; ++i)
 	{
 		for (uint32_t j = 0; j < image->mHeight; ++j)
@@ -86,4 +92,21 @@ void GPU::drawImage(const Image* image)
 			drawPoint(i, j, image->mData[j * image->mWidth + i]);
 		}
 	}
+}
+
+void GPU::drawImageWithAlpha(const Image* image, const uint32_t& alpha)
+{
+	for (uint32_t i = 0; i < image->mWidth; ++i)
+	{
+		for (uint32_t j = 0; j < image->mHeight; ++j)
+		{
+			image->mData[j * image->mWidth + i].mA = alpha;
+			drawPoint(i, j, image->mData[j * image->mWidth + i]);
+		}
+	}
+}
+
+void GPU::SetBlending(bool enable)
+{
+	mEnableBlending = enable;
 }
