@@ -131,4 +131,6 @@ void Raster::interpolantTriangle(const Point& v0, const Point& v1, const Point& 
 	target.color.mG = v0.color.mG * alpha + v1.color.mG * beta + v2.color.mG * gamma;
 	target.color.mB = v0.color.mB * alpha + v1.color.mB * beta + v2.color.mB * gamma;
 	target.color.mA = v0.color.mA * alpha + v1.color.mA * beta + v2.color.mA * gamma;
+
+	target.uv = v0.uv * alpha + v1.uv * alpha + v2.uv * gamma;
 }

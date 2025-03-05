@@ -1,5 +1,5 @@
 #pragma once
-#include "base.h"
+#include "../global/base.h"
 #include <string>
 
 class Image

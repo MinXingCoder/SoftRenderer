@@ -2,6 +2,7 @@
 #include <string.h>
 #include <algorithm>
 #include "raster.h"
+#include <cmath>
 
 GPU* GPU::mInstance = nullptr;
 
@@ -79,7 +80,14 @@ void GPU::drawTriangle(const Point& p1, const Point& p2, const Point& p3)
 
 	for (auto& item : pixels)
 	{
-		drawPoint(item.x, item.y, item.color);
+		if (mImage)
+		{
+			RGBA result = sampleNearest(item.uv);
+			drawPoint(item.x, item.y, result);
+		}
+		else {
+			drawPoint(item.x, item.y, item.color);
+		}
 	}
 }
 
@@ -106,7 +114,20 @@ void GPU::drawImageWithAlpha(const Image* image, const uint32_t& alpha)
 	}
 }
 
-void GPU::SetBlending(bool enable)
+void GPU::setBlending(bool enable)
 {
 	mEnableBlending = enable;
+}
+
+void GPU::setTexture(Image* image)
+{
+	mImage = image;
+}
+
+RGBA GPU::sampleNearest(const math::vec2f& uv)
+{
+	int x = std::round(uv.x * (mImage->mWidth - 1));
+	int y = std::round(uv.y * (mImage->mHeight - 1));
+
+	return mImage->mData[y * mImage->mWidth + x];
 }

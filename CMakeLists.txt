@@ -6,7 +6,6 @@ set(CMAKE_CXX_STANDARD 17)
 file(GLOB copyResources "./assets")
 file(COPY ${copyResources} DESTINATION ${CMAKE_BINARY_DIR})
 
-include_directories(global)
 add_subdirectory(application)
 add_subdirectory(gpu)
 

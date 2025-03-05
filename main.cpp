@@ -2,34 +2,37 @@
 #include "gpu.h"
 #include <cmath>
 #pragma comment(linker, "/subsystem:console /entry:wWinMainCRTStartup")
-Image* img0 = Image::createImage(".\\assets\\textures\\zhaohua.jpg");
-Image* img1 = Image::createImage(".\\assets\\textures\\house.jpg");
+
+Image* texture;
+Point p1;
+Point p2;
+Point p3;
+
 void render()
 {
 	sgl->clear();
+	sgl->setTexture(texture);
+	sgl->drawTriangle(p1, p2, p3);
+}
 
-	//int r = 150;
-	//Point c{ 400, 300, RGBA(255, 0, 0, 255) };
-	//for (float i = 0; i < 360; i += 10)
-	//{
-	//	float radian = DEG2RAD(i);
-	//	int x = r * std::sin(radian) + c.x;
-	//	int y = r * std::cos(radian) + c.y;
+void prepare()
+{
+	texture = Image::createImage("assets/textures/zhaohua.jpg");
 
-	//	Point pt{ x, y, RGBA(std::rand() % 255, std::rand() % 255, std::rand() % 255, 255) };
+	p1.x = 0;
+	p1.y = 0;
+	p1.color = RGBA(255, 0, 0, 255);
+	p1.uv = math::vec2f(0.0f, 0.0f);
 
-	//	sgl->drawLine(c, pt);
-	//}
+	p2.x = 400;
+	p2.y = 599;
+	p2.color = RGBA(0, 255, 0, 255);
+	p2.uv = math::vec2f(0.5f, 1.0f);
 
-	//Point p1{ 0, 100, RGBA(255, 0, 0, 255) };
-	//Point p2{ 500, 100, RGBA(0, 255, 0, 255) };
-	//Point p3{ 250, 500, RGBA(0, 0, 255, 255) };
-
-	//sgl->drawTriangle(p1, p2, p3);
-	sgl->SetBlending(true);
-	sgl->drawImage(img1);
-	sgl->drawImageWithAlpha(img0, 100);
-	//Image::destroy(img);
+	p3.x = 800;
+	p3.y = 0;
+	p3.color = RGBA(0, 0, 255, 255);
+	p3.uv = math::vec2f(1.0f, 0.0f);
 }
 
 int APIENTRY wWinMain(
@@ -44,6 +47,8 @@ int APIENTRY wWinMain(
 	}
 
 	sgl->initSurface(800, 600, app->getCanvas());
+
+	prepare();
 
 	while (true)
 	{

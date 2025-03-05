@@ -1,5 +1,5 @@
+#include "../global/base.h"
 #include "application.h"
-#include "base.h"
 #include <windef.h>
 
 LRESULT CALLBACK Wndproc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)

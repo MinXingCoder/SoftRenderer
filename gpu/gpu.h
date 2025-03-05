@@ -1,6 +1,6 @@
 #pragma once
 #include "framebuffer.h"
-#include "base.h"
+#include "../global/base.h"
 #include "../application/image.h"
 
 #define sgl GPU::getInstance()
@@ -21,11 +21,18 @@ public:
 	void drawImage(const Image* image);
 	void drawImageWithAlpha(const Image* image, const uint32_t& alpha);
 
-	void SetBlending(bool enable);
+	void setBlending(bool enable);
+
+	void setTexture(Image* image);
+
+private:
+	RGBA sampleNearest(const math::vec2f& uv);
 
 private:
 
 	static GPU* mInstance;
 	FrameBuffer* mFrameBuffer{ nullptr };
 	bool mEnableBlending{ false };
+
+	Image* mImage{ nullptr };
 };
