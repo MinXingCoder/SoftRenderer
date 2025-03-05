@@ -75,10 +75,7 @@ void Raster::interpolantLine(const Point& v0, const Point& v1, Point& target)
 		weight = static_cast<float>(target.x - v0.x) / deltaX;
 	}
 
-	target.color.mR = v0.color.mR * (1 - weight) + v1.color.mR * weight;
-	target.color.mG = v0.color.mG * (1 - weight) + v1.color.mG * weight;
-	target.color.mB = v0.color.mB * (1 - weight) + v1.color.mB * weight;
-	target.color.mA = v0.color.mA * (1 - weight) + v1.color.mA * weight;
+	target.color = lerpRGBA(v0.color, v1.color, weight);
 }
 
 void Raster::rasterizeTriangle(std::vector<Point>& results, const Point& v0, const Point& v1, const Point& v2)
@@ -127,10 +124,33 @@ void Raster::interpolantTriangle(const Point& v0, const Point& v1, const Point& 
 	float apb = std::abs(math::cross(pa, pb));
 	float gamma = apb / abc;
 
-	target.color.mR = v0.color.mR * alpha + v1.color.mR * beta + v2.color.mR * gamma;
-	target.color.mG = v0.color.mG * alpha + v1.color.mG * beta + v2.color.mG * gamma;
-	target.color.mB = v0.color.mB * alpha + v1.color.mB * beta + v2.color.mB * gamma;
-	target.color.mA = v0.color.mA * alpha + v1.color.mA * beta + v2.color.mA * gamma;
+	target.color = lerpRGBA(v0.color, v1.color, v2.color, alpha, beta, gamma);
+	target.uv = lerpUV(v0.uv, v1.uv, v2.uv, alpha, beta, gamma);
+}
 
-	target.uv = v0.uv * alpha + v1.uv * alpha + v2.uv * gamma;
+RGBA Raster::lerpRGBA(const RGBA& c0, const RGBA& c1, float weight)
+{
+	RGBA value;
+	value.mR = c1.mR * weight + c0.mR * (1 - weight);
+	value.mG = c1.mG * weight + c0.mG * (1 - weight);
+	value.mB = c1.mB * weight + c0.mB * (1 - weight);
+	value.mA = c1.mA * weight + c0.mA * (1 - weight);
+	return value;
+}
+
+RGBA Raster::lerpRGBA(const RGBA& c0, const RGBA& c1, const RGBA& c2, float weight0, float weight1, float weight2)
+{
+	RGBA value;
+	value.mR = c0.mR * weight0 + c1.mR * weight1 + c2.mR * weight2;
+	value.mG = c0.mG * weight0 + c1.mG * weight1 + c2.mG * weight2;
+	value.mB = c0.mB * weight0 + c1.mB * weight1 + c2.mB * weight2;
+	value.mA = c0.mA * weight0 + c1.mA * weight1 + c2.mA * weight2;
+
+	return value;
+}
+
+math::vec2f Raster::lerpUV(const math::vec2f& uv0, const math::vec2f& uv1, const math::vec2f& uv2, float weight0, float weight1, float weight2)
+{
+	math::vec2f value = uv0 * weight0 + uv1 * weight1 + uv2 * weight2;
+	return value;
 }

@@ -23,16 +23,20 @@ public:
 
 	void setBlending(bool enable);
 
+	void setBilinear(bool enable);
+
 	void setTexture(Image* image);
 
 private:
 	RGBA sampleNearest(const math::vec2f& uv);
+	RGBA sampleBilinear(const math::vec2f& uv);
 
 private:
 
 	static GPU* mInstance;
 	FrameBuffer* mFrameBuffer{ nullptr };
 	bool mEnableBlending{ false };
+	bool mEnableBilinear{ false };
 
 	Image* mImage{ nullptr };
 };

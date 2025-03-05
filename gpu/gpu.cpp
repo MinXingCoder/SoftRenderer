@@ -82,7 +82,11 @@ void GPU::drawTriangle(const Point& p1, const Point& p2, const Point& p3)
 	{
 		if (mImage)
 		{
-			RGBA result = sampleNearest(item.uv);
+			RGBA result;
+			if (mEnableBilinear)
+				result = sampleBilinear(item.uv);
+			else 
+				result = sampleNearest(item.uv);
 			drawPoint(item.x, item.y, result);
 		}
 		else {
@@ -119,6 +123,11 @@ void GPU::setBlending(bool enable)
 	mEnableBlending = enable;
 }
 
+void GPU::setBilinear(bool enable)
+{
+	mEnableBilinear = enable;
+}
+
 void GPU::setTexture(Image* image)
 {
 	mImage = image;
@@ -130,4 +139,49 @@ RGBA GPU::sampleNearest(const math::vec2f& uv)
 	int y = std::round(uv.y * (mImage->mHeight - 1));
 
 	return mImage->mData[y * mImage->mWidth + x];
+}
+
+RGBA GPU::sampleBilinear(const math::vec2f& uv)
+{
+	float x = uv.x * (mImage->mWidth - 1);
+	float y = uv.y * (mImage->mHeight - 1);
+
+	int left = std::floor(x);
+	int right = std::ceil(x);
+	int bottom = std::floor(y);
+	int top = std::floor(y);
+
+	int leftBottomPosition = left + bottom * mImage->mWidth;
+	int leftTopPosition = left + top * mImage->mWidth;
+	int rightBottomPosition = right + bottom * mImage->mWidth;
+	int rightTopPosition = right + top * mImage->mWidth;
+
+	RGBA leftBottomColor = mImage->mData[leftBottomPosition];
+	RGBA leftTopColor = mImage->mData[leftTopPosition];
+	RGBA rightBottomColor = mImage->mData[rightBottomPosition];
+	RGBA rightTopColor = mImage->mData[rightTopPosition];
+
+	float yWeight{};
+	if (bottom == top)
+	{
+		yWeight = 1.0f;
+	}
+	else {
+		yWeight = (top - y) / (top - bottom);
+	}
+
+	RGBA leftColor = Raster::lerpRGBA(leftTopColor, leftBottomColor, yWeight);
+	RGBA rightColor = Raster::lerpRGBA(rightTopColor, rightBottomColor, yWeight);
+
+	float xWeight{};
+	if (left == right)
+	{
+		xWeight = 1.0f;
+	}
+	else {
+		xWeight = (right - x) / (right - left);
+	}
+
+	RGBA returnColor = Raster::lerpRGBA(rightColor, leftColor, xWeight);
+	return returnColor;
 }
