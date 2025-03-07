@@ -133,18 +133,31 @@ void GPU::setTexture(Image* image)
 	mImage = image;
 }
 
+void GPU::setTextureWrap(uint32_t wrap)
+{
+	mWrap = wrap;
+}
+
 RGBA GPU::sampleNearest(const math::vec2f& uv)
 {
-	int x = std::round(uv.x * (mImage->mWidth - 1));
-	int y = std::round(uv.y * (mImage->mHeight - 1));
+	math::vec2f tmpUV = uv;
+	checkWrap(tmpUV.x);
+	checkWrap(tmpUV.y);
+
+	int x = std::round(tmpUV.x * (mImage->mWidth - 1));
+	int y = std::round(tmpUV.y * (mImage->mHeight - 1));
 
 	return mImage->mData[y * mImage->mWidth + x];
 }
 
 RGBA GPU::sampleBilinear(const math::vec2f& uv)
 {
-	float x = uv.x * (mImage->mWidth - 1);
-	float y = uv.y * (mImage->mHeight - 1);
+	math::vec2f tmpUV = uv;
+	checkWrap(tmpUV.x);
+	checkWrap(tmpUV.y);
+
+	float x = tmpUV.x * (mImage->mWidth - 1);
+	float y = tmpUV.y * (mImage->mHeight - 1);
 
 	int left = std::floor(x);
 	int right = std::ceil(x);
@@ -184,4 +197,26 @@ RGBA GPU::sampleBilinear(const math::vec2f& uv)
 
 	RGBA returnColor = Raster::lerpRGBA(rightColor, leftColor, xWeight);
 	return returnColor;
+}
+
+void GPU::checkWrap(float& n)
+{
+	if (n > 1.0f || n < 0.0f)
+	{
+		switch (mWrap)
+		{
+		case TEXTURE_WRAP_REPEAT:
+		{
+			n = FRACTION(1 + FRACTION(n));
+			break;
+		}
+		case TEXTURE_WRAP_MIRROR:
+		{
+			n = 1 - FRACTION(1 + FRACTION(n));
+			break;
+		}
+		default:
+			break;
+		}
+	}
 }
