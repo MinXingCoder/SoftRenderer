@@ -1,5 +1,4 @@
 #include "raster.h"
-#include "../math/math.h"
 
 Raster::Raster()
 {}

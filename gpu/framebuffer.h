@@ -1,6 +1,5 @@
 #pragma once
 #include "../global/base.h"
-#include <stdint.h>
 
 class FrameBuffer
 {
