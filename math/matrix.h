@@ -3,6 +3,7 @@
 #include <string.h>
 #include <assert.h>
 #include "vector.h"
+#include <iostream>
 
 namespace math
 {
@@ -77,7 +78,7 @@ namespace math
 		void set(const uint32_t& row, const uint32_t& col, T t)
 		{
 			assert(row < 3 && col < 3);
-			m[row * 3 + col] = t;
+			m[col * 3 + row] = t;
 		}
 
 		Matrix33 identity()
@@ -114,9 +115,9 @@ namespace math
 		}
 
 	public:
-		T m[9] = { 0, 0, 0,
-						0, 0, 0
-						0, 0, 0 };
+		T m[9] = { 1, 0, 0,
+						0, 1, 0
+						0, 0, 1 };
 	};
 
 	/*
@@ -129,7 +130,8 @@ namespace math
 	class Matrix44
 	{
 	public:
-		Matrix44() = default;
+		Matrix44() {}
+		
 		Matrix44(T v)
 		{
 			m[0] = m[5] = m[10] = m[15] = v;
@@ -155,7 +157,7 @@ namespace math
 			return result;
 		}
 
-		Vector4<T> operator(const Vector4<T>& v)
+		Vector4<T> operator*(const Vector4<T>& v)
 		{
 			return Vector4<T>(m[0] * v.x + m[4] * v.y + m[8] * v.z + m[12] * v.w,
 											m[1] * v.x + m[5] * v.y + m[9] * v.z + m[13] * v.w,
@@ -165,13 +167,13 @@ namespace math
 
 		T get(const uint32_t& row, const uint32_t& col) const
 		{
-			return m[row * 4 + col];
+			return m[col * 4 + row];
 		}
 
 		void set(const uint32_t& row, const uint32_t& col, T t)
 		{
 			assert(row < 4 && col < 4);
-			m[col * 4 + col] = t;
+			m[col * 4 + row] = t;
 		}
 
 		void set(T m00, T m01, T m02, T m03,
@@ -222,9 +224,12 @@ namespace math
 		}
 
 	public:
-		T m[16] = { 0, 0, 0, 0,
-						   0, 0, 0, 0,
-						   0, 0, 0, 0,
-						   0, 0, 0, 0 };
+		T m[16] = { 1, 0, 0, 0,
+						   0, 1, 0, 0,
+						   0, 0, 1, 0,
+						   0, 0, 0, 1 };
 	};
+
+	using mat3f = Matrix33<float>;
+	using mat4f = Matrix44<float>;
 }

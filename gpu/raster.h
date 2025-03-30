@@ -1,5 +1,6 @@
 #pragma once
 #include "../global/base.h"
+#include "../gpu/dataStructures.h"
 #include <vector>
 
 class Raster

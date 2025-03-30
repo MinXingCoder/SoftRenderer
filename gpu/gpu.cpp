@@ -1,8 +1,6 @@
 #include "gpu.h"
-#include <string.h>
 #include <algorithm>
 #include "raster.h"
-#include <cmath>
 
 GPU* GPU::mInstance = nullptr;
 

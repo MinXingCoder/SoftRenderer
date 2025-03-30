@@ -2,7 +2,7 @@
 #include <Windows.h>
 #include <stdint.h>
 
-#define app Application::getInstance()
+#define winApp Application::getInstance()
 
 class Application
 {

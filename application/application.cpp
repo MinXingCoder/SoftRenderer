@@ -4,7 +4,7 @@
 
 LRESULT CALLBACK Wndproc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	app->handleMessage(hWnd, message, wParam, lParam);
+	winApp->handleMessage(hWnd, message, wParam, lParam);
 	return (DefWindowProc(hWnd, message, wParam, lParam));
 }
 

@@ -1,6 +1,6 @@
 #pragma once
+#include "dataStructures.h"
 #include "framebuffer.h"
-#include "../global/base.h"
 #include "../application/image.h"
 
 #define sgl GPU::getInstance()

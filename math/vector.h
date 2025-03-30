@@ -1,4 +1,6 @@
 #pragma once
+#include <assert.h>
+
 namespace math
 {
 	template <typename T>
@@ -24,14 +26,14 @@ namespace math
 
 		T operator[](int i) const
 		{
-			STATIC_ASSERT(i >= 0 && i <= 1);
+			assert(i >= 0 && i <= 1);
 			if (i == 0) return x;
 			if (i == 1) return y;
 		}
 
 		T& operator[](int i)
 		{
-			STATIC_ASSERT(i >= 0 && i <= 1);
+			assert(i >= 0 && i <= 1);
 			if (i == 0) return x;
 			if (i == 1) return y;
 		}
@@ -123,7 +125,7 @@ namespace math
 
 		T& operator[](int i)
 		{
-			STATIC_ASSERT(i >= 0 && i <= 2);
+			assert(i >= 0 && i <= 2);
 			if (i == 0) return x;
 			if (i == 1) return y;
 			if (i == 2) return z;
@@ -218,7 +220,7 @@ namespace math
 
 		T operator[](int i) const
 		{
-			STATIC_ASSERT(i >= 0 && i <= 3);
+			assert(i >= 0 && i <= 3);
 			if (i == 0) return x;
 			if (i == 1) return y;
 			if (i == 2) return z;
@@ -227,7 +229,7 @@ namespace math
 
 		T& operator[](int i)
 		{
-			STATIC_ASSERT(i >= 0 && i <= 3);
+			assert(i >= 0 && i <= 3);
 			if (i == 0) return x;
 			if (i == 1) return y;
 			if (i == 2) return z;
