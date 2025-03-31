@@ -1,6 +1,5 @@
 #include "application/application.h"
 #include "gpu/gpu.h"
-#include "gpu/dataStructures.h"
 #include <cmath>
 #pragma comment(linker, "/subsystem:console /entry:wWinMainCRTStartup")
 
@@ -105,6 +104,18 @@ void TestTriangle()
 	sgl->drawTriangle(p1, p2, p3);
 }
 
+Image* image01 = Image::createImage("assets/textures/zhaohua.jpg");
+Image* image02 = Image::createImage("assets/textures/house.jpg");
+
+void TestImage()
+{
+	sgl->setBlending(true);
+
+	sgl->setBlending(true);
+	sgl->drawImage(image02);
+	sgl->drawImageWithAlpha(image01, 100);
+}
+
 void TestUV0()
 {
 	sgl->setTexture(texture);
@@ -123,6 +134,8 @@ void TestUV1()
 
 void TestWrap()
 {
+	changeUV();
+
 	sgl->setTexture(texture);
 	sgl->setTextureWrap(TEXTURE_WRAP_MIRROR);
 
@@ -132,18 +145,19 @@ void TestWrap()
 
 void render()
 {
-	transform();
+	// transform();
 
 	sgl->clear();
 
 	// TestLine0();
 	// TestLine1();
 	// TestTriangle();
+	// TestImage();
 	// TestUV0();
 	// TestUV1();
 
 	//changeUV();
-	//TestWrap();
+	TestWrap();
 
 	sgl->drawTriangle(p1, p2, p3);
 }
@@ -277,8 +291,8 @@ int APIENTRY wWinMain(
 
 	// prepare0();
 	// prepare1();
-	// prepare2();
-	prepare3();
+	prepare2();
+	// prepare3();
 
 	while (true)
 	{
