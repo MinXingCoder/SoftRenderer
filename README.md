@@ -5,3 +5,8 @@
 ![Line](./Image/Line.png)
 
 ![Line](Image/Line.gif)
+
+* Triangle
+
+![Triangle](Image/Triangle.png)
+

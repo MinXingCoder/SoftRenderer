@@ -96,13 +96,14 @@ void TestLine1()
 	}
 }
 
+// »­³ö (0, 100) ºì£¬(500, 100) ÂÌ£¬(250, 500) À¶ Èý½ÇÐÎ
 void TestTriangle()
 {
-	Point p1{ 0, 100, RGBA(255, 0, 0, 255) };
-	Point p2{ 500, 100, RGBA(0, 255, 0, 255) };
-	Point p3{ 250, 500, RGBA(0, 0, 255, 255) };
+	Point p0{ 0, 100, RGBA(255, 0, 0, 255) };
+	Point p1{ 500, 100, RGBA(0, 255, 0, 255) };
+	Point p2{ 250, 500, RGBA(0, 0, 255, 255) };
 
-	sgl->drawTriangle(p1, p2, p3);
+	sgl->drawTriangle(p0, p1, p2);
 }
 
 Image* image01 = Image::createImage("assets/textures/zhaohua.jpg");
@@ -150,8 +151,8 @@ void render()
 	sgl->clear();
 
 	// TestLine0();
-	TestLine1();
-	// TestTriangle();
+	// TestLine1();
+	TestTriangle();
 	// TestImage();
 	// TestUV0();
 	// TestUV1();
