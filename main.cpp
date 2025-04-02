@@ -79,19 +79,20 @@ void TestLine0()
 	sgl->drawLine(p0, p1);
 }
 
+// 以 (400, 300) 红色点为原点, 半径 150，每隔 10 度画一条线
 void TestLine1()
 {
-	int r = 150;
-	Point c{ 400, 300, RGBA(255, 0, 0, 255) };
+	int radius = 150;
+	Point origin{ 400, 300, RGBA(255, 0, 0, 255) };
 
 	for (float i = 0; i < 360; i += 10)
 	{
-		float radian = DEG2RAD(i);
-		int x = r * std::sin(radian) + c.x;
-		int y = r * std::cos(radian) + c.y;
+		float x = radius * std::cos(DEG2RAD(i)) + origin.x;
+		float y = radius * std::sin(DEG2RAD(i)) + origin.y;
 
 		Point pt{ x, y, RGBA(rand() % 255, rand() % 255, rand() % 255, 255) };
-		sgl->drawLine(c, pt);
+
+		sgl->drawLine(origin, pt);
 	}
 }
 
@@ -148,8 +149,8 @@ void render()
 
 	sgl->clear();
 
-	TestLine0();
-	// TestLine1();
+	// TestLine0();
+	TestLine1();
 	// TestTriangle();
 	// TestImage();
 	// TestUV0();
@@ -302,7 +303,7 @@ int APIENTRY wWinMain(
 		winApp->show();
 	}
 
-	Image::destroy(texture);
+	// Image::destroy(texture);
 
 	return 0;
 }
