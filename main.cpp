@@ -71,12 +71,12 @@ void changeUV()
 	q3.uv.x += speed;
 }
 
+// 画一条直线, (100, 100) 到 (500, 599)，从红色到绿色
 void TestLine0()
 {
-	Point p1{ 100, 100, RGBA(255, 0, 0, 255) };
-	Point p2{ 500, 599, RGBA(0, 255, 0, 255) };
-
-	sgl->drawLine(p1, p2);
+	Point p0{ 100, 100, RGBA(255, 0, 0, 255) };
+	Point p1{ 500, 599, RGBA(0, 255, 0, 255) };
+	sgl->drawLine(p0, p1);
 }
 
 void TestLine1()
@@ -111,7 +111,6 @@ void TestImage()
 {
 	sgl->setBlending(true);
 
-	sgl->setBlending(true);
 	sgl->drawImage(image02);
 	sgl->drawImageWithAlpha(image01, 100);
 }
@@ -149,7 +148,7 @@ void render()
 
 	sgl->clear();
 
-	// TestLine0();
+	TestLine0();
 	// TestLine1();
 	// TestTriangle();
 	// TestImage();
@@ -157,9 +156,9 @@ void render()
 	// TestUV1();
 
 	//changeUV();
-	TestWrap();
+	// TestWrap();
 
-	sgl->drawTriangle(p1, p2, p3);
+	// sgl->drawTriangle(p1, p2, p3);
 }
 
 void prepare0()
@@ -291,7 +290,7 @@ int APIENTRY wWinMain(
 
 	// prepare0();
 	// prepare1();
-	prepare2();
+	// prepare2();
 	// prepare3();
 
 	while (true)
