@@ -160,8 +160,8 @@ void render()
 	// TestLine0();
 	// TestLine1();
 	// TestTriangle();
-	TestImage();
-	// TestUV0();
+	// TestImage();
+	TestUV0();
 	// TestUV1();
 
 	//changeUV();
@@ -170,23 +170,17 @@ void render()
 	// sgl->drawTriangle(p1, p2, p3);
 }
 
+// 三个点 (0, 0), (400, 599), (799, 0) 对应 uv (0.0f, 0.0f), (0.5f, 1.0f), (1.0f, 0.0f)
 void prepare0()
 {
 	texture = Image::createImage("assets/textures/zhaohua.jpg");
 
-	p1.x = 0;
-	p1.y = 0;
-	p1.color = RGBA(255, 0, 0, 255);
+	p1.x = 0; p1.y = 0; p1.color = RGBA(255, 0, 0, 255);
+	p2.x = 400; p2.y = 599; p2.color = RGBA(0, 255, 0, 255);
+	p3.x = 799; p3.y = 0; p3.color = RGBA(0, 0, 255, 255);
+
 	p1.uv = math::vec2f(0.0f, 0.0f);
-
-	p2.x = 400;
-	p2.y = 599;
-	p2.color = RGBA(0, 255, 0, 255);
 	p2.uv = math::vec2f(0.5f, 1.0f);
-
-	p3.x = 799;
-	p3.y = 0;
-	p3.color = RGBA(0, 0, 255, 255);
 	p3.uv = math::vec2f(1.0f, 0.0f);
 }
 
@@ -297,7 +291,7 @@ int APIENTRY wWinMain(
 
 	sgl->initSurface(800, 600, winApp->getCanvas());
 
-	// prepare0();
+	prepare0();
 	// prepare1();
 	// prepare2();
 	// prepare3();
@@ -311,8 +305,8 @@ int APIENTRY wWinMain(
 		winApp->show();
 	}
 
-	ReleaseImage();
-	// Image::destroy(texture);
+	// ReleaseImage();
+	Image::destroy(texture);
 
 	return 0;
 }
