@@ -109,12 +109,19 @@ void TestTriangle()
 Image* image01 = Image::createImage("assets/textures/zhaohua.jpg");
 Image* image02 = Image::createImage("assets/textures/house.jpg");
 
+// ÉèÖÃ blend
 void TestImage()
 {
 	sgl->setBlending(true);
 
 	sgl->drawImage(image02);
 	sgl->drawImageWithAlpha(image01, 100);
+}
+
+void ReleaseImage()
+{
+	Image::destroy(image01);
+	Image::destroy(image02);
 }
 
 void TestUV0()
@@ -152,8 +159,8 @@ void render()
 
 	// TestLine0();
 	// TestLine1();
-	TestTriangle();
-	// TestImage();
+	// TestTriangle();
+	TestImage();
 	// TestUV0();
 	// TestUV1();
 
@@ -304,6 +311,7 @@ int APIENTRY wWinMain(
 		winApp->show();
 	}
 
+	ReleaseImage();
 	// Image::destroy(texture);
 
 	return 0;

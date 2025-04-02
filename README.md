@@ -10,3 +10,6 @@
 
 ![Triangle](Image/Triangle.png)
 
+* Image
+
+![Image](Image/Image.png)
