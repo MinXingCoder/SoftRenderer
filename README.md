@@ -17,3 +17,7 @@
 * uv
 
 ![image-20250403004718552](Image/uv.png)
+
+* 双线性插值
+
+![Bilinear](Image/Bilinear.png)

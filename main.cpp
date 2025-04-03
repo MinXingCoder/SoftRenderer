@@ -161,8 +161,8 @@ void render()
 	// TestLine1();
 	// TestTriangle();
 	// TestImage();
-	TestUV0();
-	// TestUV1();
+	// TestUV0();
+	TestUV1();
 
 	//changeUV();
 	// TestWrap();
@@ -184,39 +184,21 @@ void prepare0()
 	p3.uv = math::vec2f(1.0f, 0.0f);
 }
 
+/*
+* 点 (0, 0), (200, 599), (400, 0)，uv (0.0f, 0.0f), (0.5f, 1.0f), (1.0f, 0.0f)，关闭双线性插值
+* 点 (400, 0), (600, 599), (799, 0)，uv (0.0f, 0.0f), (0.5f, 1.0f), (1.0f, 0.0f)，开启双线性插值
+*/
 void prepare1()
 {
 	texture = Image::createImage("assets/textures/zhaohua.jpg");
 
-	p1.x = 0;
-	p1.y = 0;
-	p1.color = RGBA(255, 0, 0, 255);
-	p1.uv = math::vec2f(0.0f, 0.0f);
+	p1.x = 0; p1.y = 0; p1.color = RGBA(255, 0, 0, 255); p1.uv = math::vec2f(0.0f, 0.0f);
+	p2.x = 200; p2.y = 599; p2.color = RGBA(0, 255, 0, 255); p2.uv = math::vec2f(0.5f, 1.0f);
+	p3.x = 400; p3.y = 0; p3.color = RGBA(0, 0, 255, 255); p3.uv = math::vec2f(1.0f, 0.0f);
 
-	p2.x = 200;
-	p2.y = 599;
-	p2.color = RGBA(0, 255, 0, 255);
-	p2.uv = math::vec2f(0.5f, 1.0f);
-
-	p3.x = 400;
-	p3.y = 0;
-	p3.color = RGBA(0, 0, 255, 255);
-	p3.uv = math::vec2f(1.0f, 0.0f);
-
-	q1.x = 400;
-	q1.y = 0;
-	q1.color = RGBA(255, 0, 0, 255);
-	q1.uv = math::vec2f(0.0f, 0.0f);
-
-	q2.x = 600;
-	q2.y = 599;
-	q2.color = RGBA(0, 255, 0, 255);
-	q2.uv = math::vec2f(0.5f, 1.0f);
-
-	q3.x = 799;
-	q3.y = 0;
-	q3.color = RGBA(0, 0, 255, 255);
-	q3.uv = math::vec2f(1.0f, 0.0f);
+	q1.x = 400; q1.y = 0; q1.color = RGBA(255, 0, 0, 255); q1.uv = math::vec2f(0.0f, 0.0f);
+	q2.x = 600; q2.y = 599; q2.color = RGBA(0, 255, 0, 255); q2.uv = math::vec2f(0.5f, 1.0f);
+	q3.x = 799; q3.y = 0; q3.color = RGBA(0, 0, 255, 255); q3.uv = math::vec2f(1.0f, 0.0f);
 }
 
 void prepare2()
@@ -291,8 +273,8 @@ int APIENTRY wWinMain(
 
 	sgl->initSurface(800, 600, winApp->getCanvas());
 
-	prepare0();
-	// prepare1();
+	// prepare0();
+	prepare1();
 	// prepare2();
 	// prepare3();
 
