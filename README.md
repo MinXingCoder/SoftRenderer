@@ -21,3 +21,7 @@
 * 双线性插值
 
 ![Bilinear](Image/Bilinear.png)
+
+* Wrap
+
+![wrap](Image/wrap.gif)

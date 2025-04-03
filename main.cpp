@@ -60,17 +60,6 @@ void transform()
 	p3.x = sp3.x; p3.y = sp3.y;
 }
 
-float speed = 0.01f;
-void changeUV()
-{
-	p1.uv.x += speed;
-	p2.uv.x += speed;
-	p3.uv.x += speed;
-	q1.uv.x += speed;
-	q2.uv.x += speed;
-	q3.uv.x += speed;
-}
-
 // 画一条直线, (100, 100) 到 (500, 599)，从红色到绿色
 void TestLine0()
 {
@@ -140,15 +129,21 @@ void TestUV1()
 	sgl->drawTriangle(q1, q2, q3);
 }
 
+float speed = 0.01f;
+void changeUV()
+{
+	q1.uv.x += speed; q2.uv.x += speed; q3.uv.x += speed;
+	p1.uv.x += speed; p2.uv.x += speed; p3.uv.x += speed;
+}
+
 void TestWrap()
 {
 	changeUV();
 
 	sgl->setTexture(texture);
-	sgl->setTextureWrap(TEXTURE_WRAP_MIRROR);
-
-	sgl->drawTriangle(p1, p2, p3);
+	sgl->setTextureWrap(TEXTURE_WRAP_REPEAT);
 	sgl->drawTriangle(q1, q2, q3);
+	sgl->drawTriangle(p1, p2, p3);
 }
 
 void render()
@@ -162,10 +157,9 @@ void render()
 	// TestTriangle();
 	// TestImage();
 	// TestUV0();
-	TestUV1();
+	// TestUV1();
 
-	//changeUV();
-	// TestWrap();
+	TestWrap();
 
 	// sgl->drawTriangle(p1, p2, p3);
 }
@@ -201,39 +195,20 @@ void prepare1()
 	q3.x = 799; q3.y = 0; q3.color = RGBA(0, 0, 255, 255); q3.uv = math::vec2f(1.0f, 0.0f);
 }
 
+/* 点(0, 0), (400, 300), (400, 0) 对应的 uv(0.0f, 0.0f), (1.0f, 1.0f), (1.0f, 0.0f)
+*  点(0, 0), (0, 300), (400, 300) 对应的 uv(0.0f, 0.0f), (0.0f, 1.0f), (1.0f, 1.0f)
+*/
 void prepare2()
 {
 	texture = Image::createImage("assets/textures/zhaohua.jpg");
+	
+	p1.x = 0; p1.y = 0; p1.uv.x = 0.0f; p1.uv.y = 0.0f; p1.color = RGBA(255, 0, 0, 255);
+	p2.x = 400; p2.y = 300; p2.uv.x = 1.0f; p2.uv.y = 1.0f; p2.color = RGBA(0, 255, 0, 255);
+	p3.x = 400; p3.y = 0; p3.uv.x = 1.0f; p3.uv.y = 0.0f; p3.color = RGBA(0, 0, 255, 255);
 
-	p1.x = 0;
-	p1.y = 0;
-	p1.color = RGBA(255, 0, 0, 255);
-	p1.uv = math::vec2f(0.0f, 0.0f);
-
-	p2.x = 400;
-	p2.y = 300;
-	p2.color = RGBA(0, 255, 0, 255);
-	p2.uv = math::vec2f(1.0f, 1.0f);
-
-	p3.x = 400;
-	p3.y = 0;
-	p3.color = RGBA(0, 0, 255, 255);
-	p3.uv = math::vec2f(1.0f, 0.0f);
-
-	q1.x = 0;
-	q1.y = 0;
-	q1.color = RGBA(255, 0, 0, 255);
-	q1.uv = math::vec2f(0.0f, 0.0f);
-
-	q2.x = 0;
-	q2.y = 300;
-	q2.color = RGBA(0, 255, 0, 255);
-	q2.uv = math::vec2f(0.0f, 1.0f);
-
-	q3.x = 400;
-	q3.y = 300;
-	q3.color = RGBA(0, 0, 255, 255);
-	q3.uv = math::vec2f(1.0f, 1.0f);
+	q1.x = 0; q1.y = 0; q1.uv.x = 0.0f; q1.uv.y = 0.0f; q1.color = RGBA(255, 0, 0, 255);
+	q2.x = 0; q2.y = 300; q2.uv.x = 0.0f; q2.uv.y = 1.0f; q2.color = RGBA(0, 255, 0, 255);
+	q3.x = 400; q3.y = 300; q3.uv.x = 1.0f; q3.uv.y = 1.0f; q3.color = RGBA(0, 0, 255, 255);
 }
 
 void prepare3()
@@ -256,8 +231,6 @@ void prepare3()
 	perspectiveMatrix = math::perspective(60.0f, (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f);
 	screenMatrix = math::screenMatrix<float>(WIDTH, HEIGHT);
 
-	//perspectiveMatrix.printMatrix();
-	//screenMatrix.printMatrix();
 }
 
 int APIENTRY wWinMain(
@@ -274,8 +247,8 @@ int APIENTRY wWinMain(
 	sgl->initSurface(800, 600, winApp->getCanvas());
 
 	// prepare0();
-	prepare1();
-	// prepare2();
+	// prepare1();
+	prepare2();
 	// prepare3();
 
 	while (true)
