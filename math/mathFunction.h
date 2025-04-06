@@ -1,7 +1,6 @@
 #pragma once
 #include "vector.h"
 #include "matrix.h"
-#include <stdint.h>
 #include "../global/base.h"
 
 namespace math

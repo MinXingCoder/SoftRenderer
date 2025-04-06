@@ -26,19 +26,15 @@ math::mat4f screenMatrix;
 
 float angle = 0.0f;
 float cameraPos = 5.0f;
-void transform()
+void Transform()
 {
 	angle += 0.01f;
 	cameraPos += 0.01f;
 
 	modelMatrix = math::rotate(math::mat4f(1.0f), angle, math::vec3f{ 0.0f, 1.0f, 0.0f });
 
-	// modelMatrix.printMatrix();
-
 	auto cameraModelMatrix = math::translate(math::mat4f(1.0f), math::vec3f{ 0.0f, 0.0f, cameraPos });
 	viewMatrix = math::inverse(cameraModelMatrix);
-
-	// viewMatrix.printMatrix();
 
 	// mvp
 	auto sp1 = perspectiveMatrix * viewMatrix * modelMatrix * pos1;
@@ -58,6 +54,8 @@ void transform()
 	p2.x = sp2.x; p2.y = sp2.y;
 
 	p3.x = sp3.x; p3.y = sp3.y;
+
+	sgl->drawTriangle(p1, p2, p3);
 }
 
 // 画一条直线, (100, 100) 到 (500, 599)，从红色到绿色
@@ -148,8 +146,6 @@ void TestWrap()
 
 void render()
 {
-	// transform();
-
 	sgl->clear();
 
 	// TestLine0();
@@ -159,9 +155,8 @@ void render()
 	// TestUV0();
 	// TestUV1();
 
-	TestWrap();
-
-	// sgl->drawTriangle(p1, p2, p3);
+	// TestWrap();
+	Transform();
 }
 
 // 三个点 (0, 0), (400, 599), (799, 0) 对应 uv (0.0f, 0.0f), (0.5f, 1.0f), (1.0f, 0.0f)
@@ -213,8 +208,6 @@ void prepare2()
 
 void prepare3()
 {
-	texture = Image::createImage("assets/textures/zhaohua.jpg");
-
 	p1.color = RGBA(255, 0, 0, 255);
 	p1.uv = math::vec2f(0.0f, 0.0f);
 
@@ -248,8 +241,8 @@ int APIENTRY wWinMain(
 
 	// prepare0();
 	// prepare1();
-	prepare2();
-	// prepare3();
+	// prepare2();
+	prepare3();
 
 	while (true)
 	{
@@ -261,7 +254,7 @@ int APIENTRY wWinMain(
 	}
 
 	// ReleaseImage();
-	Image::destroy(texture);
+	// Image::destroy(texture);
 
 	return 0;
 }
