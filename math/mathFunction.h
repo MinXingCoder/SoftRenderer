@@ -5,6 +5,37 @@
 
 namespace math
 {
+	static math::vec2f lerp(const math::vec2f v0, const math::vec2f v1, float weight)
+	{
+		return v0 * (1 - weight) + v1 * weight;
+	}
+
+	static math::vec2f lerp(const math::vec2f v0, const math::vec2f v1, const math::vec2f v2, float alpha, float beta, float gamma)
+	{
+		return v0 * alpha + v1 * beta + v2 * gamma;
+	}
+
+	static math::vec4f lerp(const math::vec4f v0, const math::vec4f v1, float weight)
+	{
+		return v0 * (1 - weight) + v1 * weight;
+	}
+
+	static math::vec4f lerp(const math::vec4f v0, const math::vec4f v1, const math::vec4f v2, float alpha, float beta, float gamma)
+	{
+		return v0 * alpha + v1 * beta + v2 * gamma;
+	}
+
+	static RGBA lerp(const RGBA v0, const RGBA v1, float weight)
+	{
+		RGBA result;
+		result.mR = v0.mR * (1 - weight) + v1.mR * weight;
+		result.mG = v0.mG * (1 - weight) + v1.mG * weight;
+		result.mB = v0.mB * (1 - weight) + v1.mB * weight;
+		result.mA = v0.mA * (1 - weight) + v1.mA * weight;
+
+		return result;
+	}
+
 	template<typename T, typename S>
 	inline Vector2<T> operator * (S s, const Vector2<T>& v)
 	{

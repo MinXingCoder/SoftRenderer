@@ -24,11 +24,26 @@ GPU::~GPU()
 	{
 		delete mFrameBuffer;
 	}
+
+	for (auto iter : mBufferMap)
+	{
+		delete iter.second;
+	}
+
+	mBufferMap.clear();
+
+	for (auto iter : mVaoMap)
+	{
+		delete iter.second;
+	}
+
+	mVaoMap.clear();
 }
 
 void GPU::initSurface(const uint32_t& width, const uint32_t& height, void* buffer)
 {
 	mFrameBuffer = new FrameBuffer(width, height, buffer);
+	mScreenMatrix = math::screenMatrix<float>(width - 1, height - 1);
 }
 
 void GPU::clear()
@@ -37,184 +52,195 @@ void GPU::clear()
 	std::fill_n(mFrameBuffer->mColorBuffer, pixelSize, RGBA(0, 0, 0, 0));
 }
 
-void GPU::drawPoint(uint32_t x, uint32_t y, const RGBA& color)
+uint32_t GPU::genBuffer()
 {
-	if (x >= mFrameBuffer->mWidth || y >= mFrameBuffer->mHeight) return;
-	uint32_t pixelPos = x + y * mFrameBuffer->mWidth;
+	++mBufferCounter;
 
-	RGBA result = color;
+	mBufferMap.insert(std::make_pair(mBufferCounter, new BufferObject()));
 
-	if (mEnableBlending)
+	return mBufferCounter;
+}
+
+void GPU::deleteBuffer(const uint32_t& bufferId)
+{
+	auto iter = mBufferMap.find(bufferId);
+	if (iter != mBufferMap.end())
 	{
-		float weight = color.mA / 255.0f;
-		auto dst = mFrameBuffer->mColorBuffer[pixelPos];
-		result.mR = result.mR * weight + dst.mR * (1 - weight);
-		result.mG = result.mG * weight + dst.mG * (1 - weight);
-		result.mB = result.mB * weight + dst.mB * (1 - weight);
-		result.mA = result.mA * weight + dst.mA * (1 - weight);
-	}
-
-	mFrameBuffer->mColorBuffer[pixelPos] = result;
-}
-
-void GPU::drawLine(const Point& v0, const Point& v1)
-{
-	std::vector<Point> pixels;
-
-	Raster::rasterizeLine(pixels, v0, v1);
-
-	for (auto& item : pixels)
-	{
-		Raster::interpolantLine(v0, v1, item);
-		drawPoint(item.x, item.y, item.color);
-	}
-}
-
-void GPU::drawTriangle(const Point& p1, const Point& p2, const Point& p3)
-{
-	std::vector<Point> pixels;
-
-	Raster::rasterizeTriangle(pixels, p1, p2, p3);
-
-	for (auto& item : pixels)
-	{
-		if (mImage)
-		{
-			RGBA result;
-			if (mEnableBilinear)
-				result = sampleBilinear(item.uv);
-			else 
-				result = sampleNearest(item.uv);
-			drawPoint(item.x, item.y, result);
-		}
-		else {
-			drawPoint(item.x, item.y, item.color);
-		}
-	}
-}
-
-void GPU::drawImage(const Image* image)
-{
-	for (uint32_t i = 0; i < image->mWidth; ++i)
-	{
-		for (uint32_t j = 0; j < image->mHeight; ++j)
-		{
-			drawPoint(i, j, image->mData[j * image->mWidth + i]);
-		}
-	}
-}
-
-void GPU::drawImageWithAlpha(const Image* image, const uint32_t& alpha)
-{
-	for (uint32_t i = 0; i < image->mWidth; ++i)
-	{
-		for (uint32_t j = 0; j < image->mHeight; ++j)
-		{
-			image->mData[j * image->mWidth + i].mA = alpha;
-			drawPoint(i, j, image->mData[j * image->mWidth + i]);
-		}
-	}
-}
-
-void GPU::setBlending(bool enable)
-{
-	mEnableBlending = enable;
-}
-
-void GPU::setBilinear(bool enable)
-{
-	mEnableBilinear = enable;
-}
-
-void GPU::setTexture(Image* image)
-{
-	mImage = image;
-}
-
-void GPU::setTextureWrap(uint32_t wrap)
-{
-	mWrap = wrap;
-}
-
-RGBA GPU::sampleNearest(const math::vec2f& uv)
-{
-	math::vec2f tmpUV = uv;
-	checkWrap(tmpUV.x);
-	checkWrap(tmpUV.y);
-
-	int x = std::round(tmpUV.x * (mImage->mWidth - 1));
-	int y = std::round(tmpUV.y * (mImage->mHeight - 1));
-
-	return mImage->mData[y * mImage->mWidth + x];
-}
-
-RGBA GPU::sampleBilinear(const math::vec2f& uv)
-{
-	math::vec2f tmpUV = uv;
-	checkWrap(tmpUV.x);
-	checkWrap(tmpUV.y);
-
-	float x = tmpUV.x * (mImage->mWidth - 1);
-	float y = tmpUV.y * (mImage->mHeight - 1);
-
-	int left = std::floor(x);
-	int right = std::ceil(x);
-	int bottom = std::floor(y);
-	int top = std::floor(y);
-
-	int leftBottomPosition = left + bottom * mImage->mWidth;
-	int leftTopPosition = left + top * mImage->mWidth;
-	int rightBottomPosition = right + bottom * mImage->mWidth;
-	int rightTopPosition = right + top * mImage->mWidth;
-
-	RGBA leftBottomColor = mImage->mData[leftBottomPosition];
-	RGBA leftTopColor = mImage->mData[leftTopPosition];
-	RGBA rightBottomColor = mImage->mData[rightBottomPosition];
-	RGBA rightTopColor = mImage->mData[rightTopPosition];
-
-	float yWeight{};
-	if (bottom == top)
-	{
-		yWeight = 1.0f;
+		delete iter->second;
 	}
 	else {
-		yWeight = (top - y) / (top - bottom);
+		return;
 	}
 
-	RGBA leftColor = Raster::lerpRGBA(leftTopColor, leftBottomColor, yWeight);
-	RGBA rightColor = Raster::lerpRGBA(rightTopColor, rightBottomColor, yWeight);
-
-	float xWeight{};
-	if (left == right)
-	{
-		xWeight = 1.0f;
-	}
-	else {
-		xWeight = (right - x) / (right - left);
-	}
-
-	RGBA returnColor = Raster::lerpRGBA(rightColor, leftColor, xWeight);
-	return returnColor;
+	mBufferMap.erase(iter);
 }
 
-void GPU::checkWrap(float& n)
+void GPU::bindBuffer(const uint32_t& bufferType, const uint32_t& bufferId)
 {
-	if (n > 1.0f || n < 0.0f)
+	if (bufferType == ARRAY_BUFFER)
 	{
-		switch (mWrap)
-		{
-		case TEXTURE_WRAP_REPEAT:
-		{
-			n = FRACTION(1 + FRACTION(n));
-			break;
-		}
-		case TEXTURE_WRAP_MIRROR:
-		{
-			n = 1 - FRACTION(1 + FRACTION(n));
-			break;
-		}
-		default:
-			break;
-		}
+		mCurrentVBO = bufferId;
 	}
+	else if (bufferType == ELEMENT_ARRAY_BUFFER)
+	{
+		mCurrentEBO = bufferId;
+	}
+}
+
+void GPU::bufferData(const uint32_t& bufferType, size_t dataSize, void* data)
+{
+	decltype(mBufferMap.begin()) item;
+
+	if (bufferType == ARRAY_BUFFER)
+	{
+		item = mBufferMap.find(mCurrentVBO);
+	}
+	else if (bufferType == ELEMENT_ARRAY_BUFFER)
+	{
+		item = mBufferMap.find(mCurrentEBO);
+	}
+
+	if (item == mBufferMap.end()) assert(false);
+	item->second->setBufferData(dataSize, data);
+}
+
+uint32_t GPU::getVertexArray()
+{
+	++mVaoCounter;
+
+	mVaoMap.insert(std::make_pair(mVaoCounter, new VertexArrayObject()));
+
+	return mVaoCounter;
+}
+
+void GPU::deleteVertexArray(const uint32_t& vaoId)
+{
+	auto iter = mVaoMap.find(vaoId);
+	if (iter != mVaoMap.end())
+	{
+		delete iter->second;
+	}
+	else {
+		return;
+	}
+
+	mVaoMap.erase(iter);
+}
+
+void GPU::bindVertexArray(const uint32_t& vaoId)
+{
+	mCurrentVAO = vaoId;
+}
+
+void GPU::vertexAttributePointer(const uint32_t& binding, const uint32_t& itemSize, const uint32_t& stride, const uint32_t& offset)
+{
+	auto iter = mVaoMap.find(mCurrentVAO);
+	if (iter == mVaoMap.end())
+		assert(false);
+
+	iter->second->set(binding, mCurrentVBO, itemSize, stride, offset);
+}
+
+void GPU::printVAO(const uint32_t & vaoId)
+{
+	auto iter = mVaoMap.find(vaoId);
+	if (iter != mVaoMap.end())
+	{
+		iter->second->print();
+	}
+}
+
+void GPU::useProgram(Shader* shader)
+{
+	mShader = shader;
+}
+
+void GPU::drawElement(const uint32_t& drawMode, const uint32_t& first, const uint32_t& count)
+{
+	if (mCurrentVAO == 0 || mShader == nullptr || count == 0)
+	{
+		return;
+	}
+
+	auto vaoIter = mVaoMap.find(mCurrentVAO);
+	if (vaoIter == mVaoMap.end())
+	{
+		std::cerr << "Error: current vao is invalid!" << std::endl;
+		return;
+	}
+
+	const VertexArrayObject* vao = vaoIter->second;
+	auto bindingMap = vao->getBindingMap();
+
+	auto eboIter = mBufferMap.find(mCurrentEBO);
+	if (eboIter == mBufferMap.end())
+	{
+		std::cerr << "Error: current ebo is invalid!" << std::endl;
+		return;
+	}
+
+	const BufferObject* ebo = eboIter->second;
+
+	std::vector<VsOutput> vsOutputs{};
+	vertexShaderStage(vsOutputs, vao, ebo, first, count);
+
+	if (vsOutputs.empty()) return;
+
+	for (auto& output : vsOutputs)
+	{
+		perspectiveDivision(output);
+	}
+
+	for (auto& output : vsOutputs)
+	{
+		screenMapping(output);
+	}
+
+	std::vector<VsOutput> rasterOutputs;
+	Raster::rasterize(rasterOutputs, drawMode, vsOutputs);
+
+	if (rasterOutputs.empty()) return;
+
+	FsOutput fsOutput;
+	uint32_t pixelPos = 0;
+	for (uint32_t i = 0; i < rasterOutputs.size(); ++i)
+	{
+		mShader->fragmentShader(rasterOutputs[i], fsOutput);
+		pixelPos = fsOutput.mPixelPos.y * mFrameBuffer->mWidth + fsOutput.mPixelPos.x;
+		mFrameBuffer->mColorBuffer[pixelPos] = fsOutput.mColor;
+	}
+}
+
+void GPU::vertexShaderStage(
+	std::vector<VsOutput>& vsOutputs,
+	const VertexArrayObject* vao,
+	const BufferObject* ebo,
+	const uint32_t first,
+	const uint32_t count)
+{
+	auto bindingMap = vao->getBindingMap();
+	byte* indicesData = ebo->getBuffer();
+
+	uint32_t index = 0;
+	for (uint32_t i = first; i < first + count; ++i)
+	{
+		size_t indicesOffset = i * sizeof(uint32_t);
+		memcpy(&index, indicesData + indicesOffset, sizeof(uint32_t));
+
+		VsOutput output = mShader->vertexShader(bindingMap, mBufferMap, index);
+		vsOutputs.push_back(output);
+	}
+}
+
+void GPU::perspectiveDivision(VsOutput& vsOutput)
+{
+	float oneOverW = 1.0f / vsOutput.mPosition.w;
+
+	vsOutput.mPosition *= oneOverW;
+	vsOutput.mPosition.w = 1.0f;
+}
+
+void GPU::screenMapping(VsOutput& vsOuput)
+{
+	vsOuput.mPosition = mScreenMatrix * vsOuput.mPosition;
 }

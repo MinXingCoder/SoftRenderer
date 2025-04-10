@@ -6,10 +6,33 @@ Raster::Raster()
 Raster::~Raster()
 {}
 
-void Raster::rasterizeLine(std::vector<Point>& results, const Point& v0, const Point& v1)
+void Raster::rasterize(
+	std::vector<VsOutput>& results,
+	const uint32_t& drawMode,
+	const std::vector<VsOutput>& inputs
+)
 {
-	Point start = v0, end = v1;
-	if (v0.x > v1.x)
+	if (drawMode == DRAW_LINES)
+	{
+		for (uint32_t i = 0; i < inputs.size(); i += 2)
+		{
+			rasterizeLine(results, inputs[i], inputs[i + 1]);
+		}
+	}
+
+	if (drawMode == DRAW_TRIANGLES)
+	{
+		for (uint32_t i = 0; i < inputs.size(); i += 3)
+		{
+			rasterizeTriangle(results, inputs[i], inputs[i + 1], inputs[i + 2]);
+		}
+	}
+}
+
+void Raster::rasterizeLine(std::vector<VsOutput>& results, const VsOutput& v0, const VsOutput& v1)
+{
+	VsOutput start = v0, end = v1;
+	if (v0.mPosition.x > v1.mPosition.x)
 	{
 		start = v1;
 		end = v0;
@@ -18,77 +41,81 @@ void Raster::rasterizeLine(std::vector<Point>& results, const Point& v0, const P
 	results.emplace_back(start);
 
 	bool flipY = false;
-	if (start.y > end.y)
+	if (start.mPosition.y > end.mPosition.y)
 	{
-		start.y *= -1;
-		end.y *= -1;
+		start.mPosition.y *= -1;
+		end.mPosition.y *= -1;
 		flipY = true;
 	}
 
-	int deltaX = static_cast<int>(end.x - start.x);
-	int deltaY = static_cast<int>(end.y - start.y);
+	int deltaX = static_cast<int>(end.mPosition.x - start.mPosition.x);
+	int deltaY = static_cast<int>(end.mPosition.y - start.mPosition.y);
 	bool swapXY = false;
 
 	if (deltaY > deltaX)
 	{
-		std::swap(start.x, start.y);
-		std::swap(end.x, end.y);
+		std::swap(start.mPosition.x, start.mPosition.y);
+		std::swap(end.mPosition.x, end.mPosition.y);
 		swapXY = true;
 	}
 
-	deltaX = static_cast<int>(end.x - start.x);
-	deltaY = static_cast<int>(end.y - start.y);
+	deltaX = static_cast<int>(end.mPosition.x - start.mPosition.x);
+	deltaY = static_cast<int>(end.mPosition.y - start.mPosition.y);
 	int p = 2 * deltaY - deltaX;
 
-	Point currentPoint{ start.x, start.y }, resultPoint;
+	VsOutput currentPoint{ start }, resultPoint;
 	int resultX = 0, resultY = 0;
 	for (int x = 1; x < deltaX; ++x)
 	{
-		currentPoint.x = x + start.x;
+		currentPoint.mPosition.x = x + start.mPosition.x;
 		if (p >= 0)
 		{
-			currentPoint.y += 1;
+			currentPoint.mPosition.y += 1;
 			p = p - 2 * deltaX;
 		}
 
 		p = p + 2 * deltaY;
 
-		resultX = currentPoint.x, resultY = currentPoint.y;
+		resultX = currentPoint.mPosition.x, resultY = currentPoint.mPosition.y;
 		if (swapXY) std::swap(resultX, resultY);
 		if (flipY) resultY *= -1;
 		
-		resultPoint.x = resultX, resultPoint.y = resultY;
+		resultPoint.mPosition.x = resultX, resultPoint.mPosition.y = resultY;
+
+		interpolantLine(start, end, resultPoint);
+
 		results.emplace_back(resultPoint);
 	}
 }
 
-void Raster::interpolantLine(const Point& v0, const Point& v1, Point& target)
+void Raster::interpolantLine(const VsOutput& v0, const VsOutput& v1, VsOutput& target)
 {
-	int deltaX = v1.x - v0.x;
+	int deltaX = v1.mPosition.x - v0.mPosition.x;
 	float weight = 0.0f;
 	if (deltaX == 0) {
-		int deltaY = v1.y - v0.y;
-		weight = static_cast<float>(target.y - v0.y) / deltaY;
+		int deltaY = v1.mPosition.y - v0.mPosition.y;
+		weight = static_cast<float>(target.mPosition.y - v0.mPosition.y) / deltaY;
 	}
 	else {
-		weight = static_cast<float>(target.x - v0.x) / deltaX;
+		weight = static_cast<float>(target.mPosition.x - v0.mPosition.x) / deltaX;
 	}
 
-	target.color = lerpRGBA(v0.color, v1.color, weight);
+	target.mColor = math::lerp(v0.mColor, v1.mColor, weight);
+	target.mUV = math::lerp(v0.mUV, v1.mUV, weight);
 }
 
-void Raster::rasterizeTriangle(std::vector<Point>& results, const Point& v0, const Point& v1, const Point& v2)
+void Raster::rasterizeTriangle(std::vector<VsOutput>& results, const VsOutput& v0, const VsOutput& v1, const VsOutput& v2)
 {
-	int32_t maxX = std::max(v0.x, std::max(v1.x, v2.x));
-	int32_t minX = std::min(v0.x, std::min(v1.x, v2.x));
-	int32_t maxY = std::max(v0.y, std::max(v1.y, v2.y));
-	int32_t minY = std::min(v0.y, std::min(v1.y, v2.y));
+	int32_t maxX = std::max(v0.mPosition.x, std::max(v1.mPosition.x, v2.mPosition.x));
+	int32_t minX = std::min(v0.mPosition.x, std::min(v1.mPosition.x, v2.mPosition.x));
+	int32_t maxY = std::max(v0.mPosition.y, std::max(v1.mPosition.y, v2.mPosition.y));
+	int32_t minY = std::min(v0.mPosition.y, std::min(v1.mPosition.y, v2.mPosition.y));
 
 	for (int32_t i = minX; i <= maxX; ++i)
 	{
 		for (int32_t j = minY; j <= maxY; ++j)
 		{
-			math::vec2i p0(v0.x - i, v0.y - j), p1(v1.x - i, v1.y - j), p2(v2.x - i, v2.y - j);
+			math::vec2i p0(v0.mPosition.x - i, v0.mPosition.y - j), p1(v1.mPosition.x - i, v1.mPosition.y - j), p2(v2.mPosition.x - i, v2.mPosition.y - j);
 
 			float r0 = math::cross(p0, p1);
 			float r1 = math::cross(p1, p2);
@@ -97,10 +124,10 @@ void Raster::rasterizeTriangle(std::vector<Point>& results, const Point& v0, con
 			bool bNegative = (r0 < 0) && (r1 < 0) && (r2 < 0);
 			bool bPositive = (r0 > 0) && (r1 > 0) && (r2 > 0);
 
-			Point tmp;
+			VsOutput tmp;
 			if (bNegative || bPositive)
 			{
-				tmp.x = i, tmp.y = j, tmp.color = RGBA();
+				tmp.mPosition.x = i, tmp.mPosition.y = j;
 				interpolantTriangle(v0, v1, v2, tmp);
 				results.emplace_back(tmp);
 			}
@@ -108,48 +135,21 @@ void Raster::rasterizeTriangle(std::vector<Point>& results, const Point& v0, con
 	}
 }
 
-void Raster::interpolantTriangle(const Point& v0, const Point& v1, const Point& v2, Point& target)
+void Raster::interpolantTriangle(const VsOutput& v0, const VsOutput& v1, const VsOutput& v2, VsOutput& target)
 {
-	math::vec2f ab(v1.x - v0.x, v1.y - v0.y), ac(v2.x - v0.x, v2.y - v0.y);
+	math::vec2f ab(v1.mPosition.x - v0.mPosition.x, v1.mPosition.y - v0.mPosition.y), ac(v2.mPosition.x - v0.mPosition.x, v2.mPosition.y - v0.mPosition.y);
 	float abc = std::abs(math::cross(ab, ac));
-	math::vec2f pb(v1.x - target.x, v1.y - target.y), pc(v2.x - target.x, v2.y - target.y);
+	math::vec2f pb(v1.mPosition.x - target.mPosition.x, v1.mPosition.y - target.mPosition.y), pc(v2.mPosition.x - target.mPosition.x, v2.mPosition.y - target.mPosition.y);
 	float bpc = std::abs(math::cross(pb, pc));
 	float alpha = bpc / abc;
 
-	math::vec2f pa(v0.x - target.x, v0.y - target.y);
+	math::vec2f pa(v0.mPosition.x - target.mPosition.x, v0.mPosition.y - target.mPosition.y);
 	float apc = std::abs(math::cross(pa, pc));
 	float beta = apc / abc;
 
 	float apb = std::abs(math::cross(pa, pb));
 	float gamma = apb / abc;
 
-	target.color = lerpRGBA(v0.color, v1.color, v2.color, alpha, beta, gamma);
-	target.uv = lerpUV(v0.uv, v1.uv, v2.uv, alpha, beta, gamma);
-}
-
-RGBA Raster::lerpRGBA(const RGBA& c0, const RGBA& c1, float weight)
-{
-	RGBA value;
-	value.mR = c1.mR * weight + c0.mR * (1 - weight);
-	value.mG = c1.mG * weight + c0.mG * (1 - weight);
-	value.mB = c1.mB * weight + c0.mB * (1 - weight);
-	value.mA = c1.mA * weight + c0.mA * (1 - weight);
-	return value;
-}
-
-RGBA Raster::lerpRGBA(const RGBA& c0, const RGBA& c1, const RGBA& c2, float weight0, float weight1, float weight2)
-{
-	RGBA value;
-	value.mR = c0.mR * weight0 + c1.mR * weight1 + c2.mR * weight2;
-	value.mG = c0.mG * weight0 + c1.mG * weight1 + c2.mG * weight2;
-	value.mB = c0.mB * weight0 + c1.mB * weight1 + c2.mB * weight2;
-	value.mA = c0.mA * weight0 + c1.mA * weight1 + c2.mA * weight2;
-
-	return value;
-}
-
-math::vec2f Raster::lerpUV(const math::vec2f& uv0, const math::vec2f& uv1, const math::vec2f& uv2, float weight0, float weight1, float weight2)
-{
-	math::vec2f value = uv0 * weight0 + uv1 * weight1 + uv2 * weight2;
-	return value;
+	target.mColor = math::lerp(v0.mColor, v1.mColor, v2.mColor, alpha, beta, gamma);
+	target.mUV = lerp(v0.mUV, v1.mUV, v2.mUV, alpha, beta, gamma);
 }

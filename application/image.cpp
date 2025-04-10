@@ -29,9 +29,9 @@ Image* Image::createImage(const std::string& path)
 	stbi_set_flip_vertically_on_load(true);
 	unsigned char* data = stbi_load(path.c_str(), &x, &y, &channel, STBI_rgb_alpha);
 
-	size_t xy = x * y * 4;
+	int xy = x * y * 4;
 	// ½« rgba ×ªÎª bgra
-	for (size_t i = 0; i < xy; i+= 4)
+	for (int i = 0; i < xy; i+= 4)
 	{
 		byte tmp = data[i];
 		data[i] = data[i + 2];

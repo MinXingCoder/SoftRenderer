@@ -1,7 +1,12 @@
 #pragma once
 #include "dataStructures.h"
 #include "framebuffer.h"
+#include <map>
+#include "bufferobject.h"
+#include "vao.h"
 #include "../application/image.h"
+#include "shader.h"
+#include <vector>
 
 #define sgl GPU::getInstance()
 
@@ -15,32 +20,60 @@ public:
 
 	void initSurface(const uint32_t& width, const uint32_t& height, void* buffer);
 	void clear();
-	void drawPoint(uint32_t x, uint32_t y, const RGBA& color);
-	void drawLine(const Point& v0, const Point& v1);
-	void drawTriangle(const Point& p1, const Point& p2, const Point& p3);
-	void drawImage(const Image* image);
-	void drawImageWithAlpha(const Image* image, const uint32_t& alpha);
 
-	void setBlending(bool enable);
+	uint32_t genBuffer();
 
-	void setBilinear(bool enable);
+	void deleteBuffer(const uint32_t& bufferId);
 
-	void setTexture(Image* image);
+	void bindBuffer(const uint32_t& bufferType, const uint32_t& bufferId);
 
-	void setTextureWrap(uint32_t wrap);
+	void bufferData(const uint32_t& bufferType, size_t dataSize, void* data);
+
+	uint32_t getVertexArray();
+
+	void deleteVertexArray(const uint32_t& vaoId);
+
+	void bindVertexArray(const uint32_t& vaoId);
+
+	void vertexAttributePointer(
+		const uint32_t& binding,
+		const uint32_t& itemSize,
+		const uint32_t& stride,
+		const uint32_t& offset
+	);
+
+	void useProgram(Shader* shader);
+
+	void drawElement(const uint32_t& drawMode, const uint32_t& fisrt, const uint32_t& count);
+
+	void printVAO(const uint32_t& vaoId);
 
 private:
-	RGBA sampleNearest(const math::vec2f& uv);
-	RGBA sampleBilinear(const math::vec2f& uv);
-	void checkWrap(float& n);
+	void vertexShaderStage(
+		std::vector<VsOutput>& vsOutputs,
+		const VertexArrayObject* vao,
+		const BufferObject* ebo,
+		const uint32_t first,
+		const uint32_t count
+	);
+
+	void perspectiveDivision(VsOutput& vsOutput);
+	void screenMapping(VsOutput& vsOutput);
 
 private:
 
 	static GPU* mInstance;
 	FrameBuffer* mFrameBuffer{ nullptr };
-	uint32_t mWrap{ TEXTURE_WRAP_REPEAT };
-	bool mEnableBlending{ false };
-	bool mEnableBilinear{ false };
 
-	Image* mImage{ nullptr };
+	uint32_t mCurrentVBO{ 0 };
+	uint32_t mCurrentEBO{ 0 };
+	uint32_t mBufferCounter{ 0 };
+	std::map<uint32_t, BufferObject*> mBufferMap;
+
+	uint32_t mCurrentVAO{ 0 };
+	uint32_t mVaoCounter{ 0 };
+	std::map<uint32_t, VertexArrayObject*> mVaoMap;
+
+	Shader* mShader{ nullptr };
+	math::mat4f mScreenMatrix;
 };
