@@ -1,19 +1,19 @@
 #pragma once
 #include <map>
-#include "dataStructures.h"
+#include "datastructures.h"
 
 class VertexArrayObject
 {
 public:
-	VertexArrayObject();
-	~VertexArrayObject();
+    VertexArrayObject();
+    ~VertexArrayObject();
 
-	void set(size_t binding, size_t vboId, size_t itemSize, size_t stride, size_t offset);
+    void set(size_t binding, size_t vboId, size_t itemSize, size_t stride, size_t offset);
 
-	std::map<uint32_t, BindingDescription> getBindingMap() const;
+    std::map<uint32_t, BindingDescription> getBindingMap() const;
 
-	void print();
+    void print();
 
 private:
-	std::map<uint32_t, BindingDescription> mBindingMap;
+    std::map<uint32_t, BindingDescription> mBindingMap;
 };

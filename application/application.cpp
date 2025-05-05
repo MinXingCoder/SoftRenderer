@@ -1,176 +1,134 @@
-#include "../global/base.h"
 #include "application.h"
-#include <windef.h>
-
-LRESULT CALLBACK Wndproc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	winApp->handleMessage(hWnd, message, wParam, lParam);
-	return (DefWindowProc(hWnd, message, wParam, lParam));
-}
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl2.h"
+#include "../gpu/framebuffer.h"
+#include <GLFW/glfw3.h>
+#include <stdio.h>
 
 Application* Application::getInstance()
 {
-	if (mInstance == nullptr)
-	{
-		static Application application;
-		mInstance = &application;
-	}
-
-	return mInstance;
+    static Application app;
+    return &app;
 }
 
-Application* Application::mInstance = nullptr;
-
-bool Application::initApplication(HINSTANCE hInstance, const uint32_t& width, const uint32_t& height)
+static void glfw_error_callback(int error, const char* description)
 {
-	mWidth = width;
-	mHeight = height;
-
-	// 0 ±íÊ¾ error
-	if (0 == registerWindowClass(hInstance))
-		return false;
-
-	if (!createWindow(hInstance))
-		return false;
-
-	mhDC = GetDC(mHwnd);
-
-	mCanvasDC = CreateCompatibleDC(mhDC);
-
-	BITMAPINFO bmpInfo{};
-	bmpInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-	bmpInfo.bmiHeader.biWidth = mWidth;
-	bmpInfo.bmiHeader.biHeight = mHeight;
-	bmpInfo.bmiHeader.biPlanes = 1;
-	bmpInfo.bmiHeader.biBitCount = 32;
-	bmpInfo.bmiHeader.biCompression = BI_RGB;
-
-	mhBmp = CreateDIBSection(
-		mCanvasDC,
-		&bmpInfo,
-		DIB_RGB_COLORS,
-		(void**)&mCanvasBuffer,
-		0, 0);
-
-	SelectObject(mCanvasDC, mhBmp);
-
-	memset(mCanvasBuffer, 0, mWidth * mHeight * sizeof(RGBA));
-
-	return true;
+    fprintf(stderr, "GLFW Error %d: %s\n", error, description);
 }
 
-BOOL Application::createWindow(HINSTANCE hInstance)
+static GLuint gImageTexture;
+
+bool Application::initApplication(const uint32_t& width, const uint32_t& height)
 {
-	mWindowInst = hInstance;
+    mWidth = width;
+    mHeight = height;
 
-	auto dwExStyle = WS_EX_APPWINDOW;
-	auto dwStyle =
-		WS_OVERLAPPEDWINDOW |
-		WS_CLIPSIBLINGS |
-		WS_CLIPCHILDREN;
+    glfwSetErrorCallback(glfw_error_callback);
 
-	RECT windowRect;
-	windowRect.left = 0L;
-	windowRect.top = 0L;
-	windowRect.right = (long)mWidth;
-	windowRect.bottom = (long)mHeight;
+    if (!glfwInit())
+        return false;
 
-	AdjustWindowRectEx(
-		&windowRect,
-		dwStyle,
-		FALSE,
-		dwExStyle
-	);
+    mWindow = glfwCreateWindow(mWidth, mHeight, "SoftRender Example", nullptr, nullptr);
+    if (!mWindow)
+        return false;
 
-	mHwnd = CreateWindowW(
-		mWindowClassName,
-		(LPCWSTR)"GraphicLearning",
-		dwStyle,
-		500, 500,
-		windowRect.right - windowRect.left,
-		windowRect.bottom - windowRect.top,
-		nullptr,
-		nullptr,
-		hInstance,
-		nullptr);
+    glfwMakeContextCurrent(mWindow);
+    glfwSwapInterval(1);    // Enable vsync
 
-	if (mHwnd == NULL) return FALSE;
+    // Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
 
-	ShowWindow(mHwnd, true);
-	UpdateWindow(mHwnd);
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
 
-	return TRUE;
+    ImGui_ImplGlfw_InitForOpenGL(mWindow, true);
+    ImGui_ImplOpenGL2_Init();
+
+    if (!mFrameBuffer)
+    {
+        mFrameBuffer = new FrameBuffer(mWidth, mHeight, nullptr);
+        memset(mFrameBuffer->mColorBuffer, 0, sizeof(RGBA) * mWidth * mHeight);
+    }
+
+    InitTexture();
+
+    return true;
 }
 
-void Application::handleMessage(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+void Application::InitTexture()
 {
-	switch (message)
-	{
-		case WM_CLOSE: {
-			DestroyWindow(hWnd);
-			break;
-		}
-		case WM_PAINT: {
-			PAINTSTRUCT ps;
-			HDC hdc = BeginPaint(hWnd, &ps);
-			EndPaint(hWnd, &ps);
-			break;
-		}
-		case WM_DESTROY: {
-			PostQuitMessage(0);
-			mAlive = false;
-			break;
-		}
-	}
+    glGenTextures(1, &gImageTexture);
+    glBindTexture(GL_TEXTURE_2D, gImageTexture);
+
+    // Setup filtering paramters for display
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // Upload pixels into texture
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 }
 
-ATOM Application::registerWindowClass(HINSTANCE hInstance)
+void Application::close()
 {
-	WNDCLASSEXW wndClass;
+    ImGui_ImplOpenGL2_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 
-	wndClass.cbSize = sizeof(WNDCLASSEX);
-	wndClass.style = CS_HREDRAW | CS_VREDRAW;
-	wndClass.lpfnWndProc = Wndproc;
-	wndClass.cbClsExtra = 0;
-	wndClass.cbWndExtra = 0;
-	wndClass.hInstance = hInstance;
-	wndClass.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-	wndClass.hCursor = LoadCursor(NULL, IDC_ARROW);
-	wndClass.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
-	wndClass.lpszMenuName = NULL;
-	wndClass.lpszClassName = mWindowClassName;
-	wndClass.hIconSm = LoadIcon(NULL, IDI_WINLOGO);
+    glfwDestroyWindow(mWindow);
+    glfwTerminate();
 
-	return RegisterClassExW(&wndClass);
+    if (mFrameBuffer)
+        delete mFrameBuffer;
 }
 
 bool Application::peekMessage()
 {
-	MSG msg;
-	if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
-	{
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
-	}
-	return mAlive;
+    bool alive = glfwWindowShouldClose(mWindow);
+    glfwPollEvents();
+    return alive;
+}
+
+void Application::beginFrame()
+{
+    ImGui_ImplOpenGL2_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+
+    ImGui::Begin("SoftRender");
+}
+
+void Application::endFrame()
+{
+    ImGui::End();
+
+    ImGui::Render();
+    glViewport(0, 0, mWidth, mHeight);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
+    glfwMakeContextCurrent(mWindow);
+    glfwSwapBuffers(mWindow);
 }
 
 void Application::show()
 {
-	BitBlt(mhDC, 0, 0, mWidth, mHeight, mCanvasDC, 0, 0, SRCCOPY);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, mWidth, mHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, mFrameBuffer->mColorBuffer);
+    ImGui::Image((ImTextureID)(intptr_t)gImageTexture, ImVec2(mWidth, mHeight));
 }
 
 uint32_t Application::getWidth() const
 {
-	return mWidth;
+    return mWidth;
 }
 
 uint32_t Application::getHeight() const
 {
-	return mHeight;
+    return mHeight;
 }
 
-void* Application::getCanvas() const
+void* Application::getFrameBuffer() const
 {
-	return reinterpret_cast<void*>(mCanvasBuffer);
+    return (void*)mFrameBuffer;
 }

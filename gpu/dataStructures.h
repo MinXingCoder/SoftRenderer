@@ -1,24 +1,26 @@
 #pragma once
-#include "../math/math.h"
+#include "../global/base.h"
+#include <stdint.h>
+#include <glm/glm.hpp>
 
 struct BindingDescription
 {
-	uint32_t mVboId{ 0 };
-	size_t mItemSize{ 0 };
-	size_t mStride{ 0 };
-	size_t mOffset{ 0 };
+    uint32_t mVobId {0};
+    size_t mItemSize {0};
+    size_t mStride {0};
+    size_t mOffset {0};
 };
 
 struct VsOutput
 {
-	math::vec4f mPosition{ 0.0f, 0.0f, 0.0f, 1.0f };
-	math::vec4f mColor;		// 0.0f ~ 1.0f
-	math::vec2f mUV;
+    glm::vec4 mPosition{0.0f, 0.0f, 0.0f, 1.0f};
+    glm::vec4 mColor;
+    glm::vec2 mUV;
 };
 
 struct FsOutput
 {
-	math::vec2i mPixelPos;
-	float mDepth;
-	RGBA mColor;					// 0 ~ 255
+    glm::u32vec2 mPixelPos;
+    float mDepth;
+    RGBA mColor;
 };

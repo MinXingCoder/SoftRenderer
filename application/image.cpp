@@ -1,52 +1,58 @@
 #include "image.h"
 #define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image.h"
+#include "stb_image_write.h"
 
 Image::Image(const uint32_t& width, const uint32_t& height, const RGBA* data)
-	: mWidth(width)
-	, mHeight(height)
+    : mWidth(width)
+    , mHeight(height)
 {
-	if (data)
-	{
-		mData = new RGBA[width * height];
-		memcpy(mData, data, width * height * sizeof(RGBA));
-	}
+    if(data)
+    {
+        mData = new RGBA[width * height];
+        memcpy(mData, data, width * height * sizeof(RGBA));
+    }
 }
 
 Image::~Image()
 {
-	if (mData)
-	{
-		delete[] mData;
-	}
+    if(mData)
+    {
+        delete[] mData;
+    }
 }
 
-Image* Image::createImage(const std::string& path)
+Image* Image::readImage(const std::string& path)
 {
-	int channel{}, x{}, y{};
+    int channel{}, x{}, y{};
 
-	// stbi ¿â¶ÁÈ¡Í¼Æ¬ÊÇ×óÉÏ½ÇÎªÔ­µã£¬ÏòÏÂÎª y Öá£¬ĞèÒª½øĞĞ·­×ª
-	stbi_set_flip_vertically_on_load(true);
-	unsigned char* data = stbi_load(path.c_str(), &x, &y, &channel, STBI_rgb_alpha);
+    // stbi åº“è¯»å–å›¾ç‰‡æ˜¯å·¦ä¸Šè§’ä¸ºåŸç‚¹, å‘ä¸‹ä¸º y è½´, éœ€è¦è¿›è¡Œç¿»è½¬
+    stbi_set_flip_vertically_on_load(true);
+    unsigned char* data = stbi_load(path.c_str(), &x, &y, &channel, STBI_rgb_alpha);
 
-	int xy = x * y * 4;
-	// ½« rgba ×ªÎª bgra
-	for (int i = 0; i < xy; i+= 4)
-	{
-		byte tmp = data[i];
-		data[i] = data[i + 2];
-		data[i + 2] = tmp;
-	}
+    int xy = x * y * 4;
+    Image* img = new Image(x, y, (RGBA*)data);
 
-	Image* img = new Image(x, y, (RGBA*)data);
+    stbi_image_free(data);
 
-	stbi_image_free(data);
+    return img;
+}
 
-	return img;
+bool Image::writeImage(
+        const std::string& path,
+        const uint32_t& width,
+        const uint32_t& height,
+        const uint32_t& channel,
+        const RGBA* data)
+{
+    int result = stbi_write_png(path.c_str(), width, height, channel, data, width * 4);
+    if(result) return true;
+    return false;
 }
 
 void Image::destroy(const Image* image)
 {
-	if (image)
-		delete image;
+    if(image)
+        delete image;
 }

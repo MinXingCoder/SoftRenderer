@@ -1,14 +1,10 @@
-cmake_minimum_required(VERSION 3.24)
-project(SoftRenderer)
+cmake_minimum_required(VERSION 3.20)
+project(SoftRender)
 
 set(CMAKE_CXX_STANDARD 17)
-
-file(GLOB copyResources "./assets")
-file(COPY ${copyResources} DESTINATION ${CMAKE_BINARY_DIR})
 
 add_subdirectory(application)
 add_subdirectory(gpu)
 
-add_executable(${PROJECT_NAME} "main.cpp")
-add_executable(testMath "testMath.cpp")
-target_link_libraries(${PROJECT_NAME} applicationlib gpulib)
+add_executable(${PROJECT_NAME} main.cpp)
+target_link_libraries(${PROJECT_NAME} PRIVATE applicationlib gpulib)

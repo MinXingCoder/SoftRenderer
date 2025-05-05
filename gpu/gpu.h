@@ -1,79 +1,78 @@
 #pragma once
-#include "dataStructures.h"
-#include "framebuffer.h"
 #include <map>
-#include "bufferobject.h"
-#include "vao.h"
-#include "../application/image.h"
-#include "shader.h"
-#include <vector>
+#include "datastructures.h"
 
 #define sgl GPU::getInstance()
+
+class FrameBuffer;
+class BufferObject;
+class VertexArrayObject;
+class Shader;
 
 class GPU
 {
 public:
-	static GPU* getInstance();
-	
-	GPU();
-	~GPU();
+    static GPU* getInstance();
 
-	void initSurface(const uint32_t& width, const uint32_t& height, void* buffer);
-	void clear();
+    GPU();
+    ~GPU();
 
-	uint32_t genBuffer();
+    void initSurface(const uint32_t& width, const uint32_t& height, void* buffer);
+    void clear();
 
-	void deleteBuffer(const uint32_t& bufferId);
+    uint32_t genBuffer();
 
-	void bindBuffer(const uint32_t& bufferType, const uint32_t& bufferId);
+    void deleteBuffer(const uint32_t& bufferId);
 
-	void bufferData(const uint32_t& bufferType, size_t dataSize, void* data);
+    void bindBuffer(const uint32_t& bufferType, const uint32_t& bufferId);
 
-	uint32_t getVertexArray();
+    void bufferData(const uint32_t& bufferType, size_t dataSize, void* data);
 
-	void deleteVertexArray(const uint32_t& vaoId);
+    uint32_t getVertexArray();
 
-	void bindVertexArray(const uint32_t& vaoId);
+    void deleteVertexArray(const uint32_t& vaoId);
 
-	void vertexAttributePointer(
-		const uint32_t& binding,
-		const uint32_t& itemSize,
-		const uint32_t& stride,
-		const uint32_t& offset
-	);
+    void bindVertexArray(const uint32_t& vaoId);
 
-	void useProgram(Shader* shader);
+    void vertexAttributePointer(
+        const uint32_t& binding,
+        const uint32_t& itemSize,
+        const uint32_t& stride,
+        const uint32_t& offset
+    );
 
-	void drawElement(const uint32_t& drawMode, const uint32_t& fisrt, const uint32_t& count);
+    void useProgram(Shader* shader);
 
-	void printVAO(const uint32_t& vaoId);
+    void drawElement(const uint32_t& drawMode, const uint32_t& first, const uint32_t& count);
 
-private:
-	void vertexShaderStage(
-		std::vector<VsOutput>& vsOutputs,
-		const VertexArrayObject* vao,
-		const BufferObject* ebo,
-		const uint32_t first,
-		const uint32_t count
-	);
-
-	void perspectiveDivision(VsOutput& vsOutput);
-	void screenMapping(VsOutput& vsOutput);
+    void printVAO(const uint32_t& vaoId);
 
 private:
+    void vertexShaderStage(
+        std::vector<VsOutput>& vsOutputs,
+        const VertexArrayObject* vao,
+        const BufferObject* ebo,
+        const uint32_t first,
+        const uint32_t count
+    );
 
-	static GPU* mInstance;
-	FrameBuffer* mFrameBuffer{ nullptr };
+    void perspectiveDivision(VsOutput& vsOutput);
+    void screenMapping(VsOutput& vsOutput);
 
-	uint32_t mCurrentVBO{ 0 };
-	uint32_t mCurrentEBO{ 0 };
-	uint32_t mBufferCounter{ 0 };
-	std::map<uint32_t, BufferObject*> mBufferMap;
+private:
 
-	uint32_t mCurrentVAO{ 0 };
-	uint32_t mVaoCounter{ 0 };
-	std::map<uint32_t, VertexArrayObject*> mVaoMap;
+    static GPU* mInstance;
+    FrameBuffer* mFrameBuffer{nullptr};
 
-	Shader* mShader{ nullptr };
-	math::mat4f mScreenMatrix;
+    uint32_t mCurrentVBO {0};
+    uint32_t mCurrentEBO {0};
+    uint32_t mBufferCounter{0};
+    std::map<uint32_t, BufferObject*> mBufferMap;
+
+    uint32_t mCurrentVAO {0};
+    uint32_t mVaoCounter {0};
+    std::map<uint32_t, VertexArrayObject*> mVaoMap;
+
+    Shader* mShader {nullptr};
+    glm::mat4x4 mScreenMatrix;
 };

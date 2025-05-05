@@ -9,18 +9,18 @@ using byte = unsigned char;
 
 struct RGBA
 {
-	byte mB;
-	byte mG;
-	byte mR;
-	byte mA;
+    byte mR;
+    byte mG;
+    byte mB;
+    byte mA;
 
-	// a 255 完全不透明
-	RGBA(byte r = 255, byte g = 255, byte b = 255, byte a = 255)
-		: mB(b)
-		, mG(g)
-		, mR(r)
-		, mA(a)
-	{}
+    // a 255 完全不透明
+    RGBA(byte r = 255, byte g = 255, byte b = 255, byte a = 255)
+        : mR(r)
+        , mG(g)
+        , mB(b)
+        , mA(a)
+    {}
 };
 
 #define ARRAY_BUFFER 0

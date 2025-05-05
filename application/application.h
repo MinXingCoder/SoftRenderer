@@ -1,53 +1,40 @@
 #pragma once
-#include <Windows.h>
 #include <stdint.h>
 
 #define winApp Application::getInstance()
 
+class GLFWwindow;
+class FrameBuffer;
+
 class Application
 {
 public:
-	static Application* getInstance();
+  static Application* getInstance();
 
-	bool initApplication(HINSTANCE hInstance, const uint32_t& width, const uint32_t& height);
+  bool initApplication(const uint32_t& width, const uint32_t& height);
 
-	void handleMessage(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+  void close();
 
-	bool peekMessage();
+  bool peekMessage();
 
-	void show();
+  void beginFrame();
 
-	uint32_t getWidth() const;
+  void endFrame();
 
-	uint32_t getHeight() const;
+  void show();
 
-	void* getCanvas() const;
+  uint32_t getWidth() const;
+
+  uint32_t getHeight() const;
+
+  void* getFrameBuffer() const;
 
 private:
-	BOOL createWindow(HINSTANCE hInstance);
+  void InitTexture();
 
-	ATOM registerWindowClass(HINSTANCE hInstance);
+  GLFWwindow* mWindow {nullptr};
+  FrameBuffer* mFrameBuffer {nullptr};
 
-private:
-	static Application* mInstance;
-
-	bool mAlive{ true };
-
-	HINSTANCE mWindowInst;
-
-	const WCHAR* mWindowClassName = L"MyApplication";
-
-	HWND mHwnd;
-
-	uint32_t mWidth{ 800 };
-
-	uint32_t mHeight{ 600 };
-
-	HDC mhDC;
-
-	HDC mCanvasDC;
-
-	HBITMAP mhBmp;
-
-	void* mCanvasBuffer{ nullptr };
+  uint32_t mWidth{ 0 };
+  uint32_t mHeight{ 0 };
 };
