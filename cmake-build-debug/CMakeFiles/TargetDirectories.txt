@@ -1,0 +1,10 @@
+/Users/scc/Desktop/SoftRenderer/cmake-build-debug/CMakeFiles/SoftRenderer.dir
+/Users/scc/Desktop/SoftRenderer/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/scc/Desktop/SoftRenderer/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/Users/scc/Desktop/SoftRenderer/cmake-build-debug/application/CMakeFiles/imgui.dir
+/Users/scc/Desktop/SoftRenderer/cmake-build-debug/application/CMakeFiles/applicationlib.dir
+/Users/scc/Desktop/SoftRenderer/cmake-build-debug/application/CMakeFiles/edit_cache.dir
+/Users/scc/Desktop/SoftRenderer/cmake-build-debug/application/CMakeFiles/rebuild_cache.dir
+/Users/scc/Desktop/SoftRenderer/cmake-build-debug/gpu/CMakeFiles/gpulib.dir
+/Users/scc/Desktop/SoftRenderer/cmake-build-debug/gpu/CMakeFiles/edit_cache.dir
+/Users/scc/Desktop/SoftRenderer/cmake-build-debug/gpu/CMakeFiles/rebuild_cache.dir
