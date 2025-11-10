@@ -5,6 +5,7 @@
 #define sgi Gpu::getInstance()
 
 #include "../global/base.h"
+#include "../application/Image.h"
 
 class FrameBuffer;
 
@@ -21,6 +22,10 @@ public:
     void drawPoint(const Point& point);
 
     void drawLine(const Point& start, const Point& end);
+
+    void drawTriangle(const Point& p0, const Point& p1, const Point& p2);
+
+    void drawImage(const Image* image);
 
 private:
     Gpu() = default;

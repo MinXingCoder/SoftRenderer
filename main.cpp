@@ -1,12 +1,16 @@
 #include <application.h>
 #include <gpu.h>
 
-void Render()
-{
-    Point start { 0, 0, RGBA{255, 255, 255, 255} };
-    Point end { 100, 799, RGBA{255, 255, 255, 255} };
+Image* gImage = nullptr;
 
-    sgi->drawLine(start, end);
+void initImage()
+{
+    gImage = Image::createImage("../assets/textures/goku.jpg");
+}
+
+void render()
+{
+    sgi->drawImage(gImage);
 }
 
 int main()
@@ -17,11 +21,13 @@ int main()
     result = sgi->initSurface(winApp->getFrameBuffer());
     if(!result) return -1;
 
+    initImage();
+
     while(!winApp->windowShouldClose())
     {
         winApp->pollEvents();
 
-        Render();
+        render();
 
         winApp->beginFrame();
         winApp->render();

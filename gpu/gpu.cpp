@@ -46,6 +46,35 @@ void Gpu::drawLine(const Point& start, const Point& end)
 
     for(size_t i = 0; i < results.size(); ++i)
     {
+        Raster::interpolantLine(start, end, results[i]);
         drawPoint(results[i]);
+    }
+}
+
+void Gpu::drawTriangle(const Point& p0, const Point& p1, const Point& p2)
+{
+    std::vector<Point> results;
+    Raster::rasterTriangle(p0, p1, p2, results);
+
+    for(size_t i = 0; i < results.size(); ++i)
+    {
+        Raster::interpolantTriangle(p0, p1, p2, results[i]);
+        drawPoint(results[i]);
+    }
+}
+
+void Gpu::drawImage(const Image* image)
+{
+    int width = image->getWidth();
+    int height = image->getHeight();
+
+    for(int i = 0; i < height; ++i)
+    {
+        for(int j = 0; j < width; ++j)
+        {
+            Point point;
+            point.x = j, point.y = i, point.color = image->getPointColor(j, i);
+            drawPoint(point);
+        }
     }
 }

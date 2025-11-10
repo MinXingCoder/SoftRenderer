@@ -3,6 +3,9 @@ project(SoftRenderer)
 
 set(CMAKE_CXX_STANDARD 17)
 
+file(GLOB ASSETS "./assets")
+file(COPY ${ASSETS} DESTINATION ${CMAKE_BINARY_DIR})
+
 add_subdirectory(application)
 add_subdirectory(gpu)
 
