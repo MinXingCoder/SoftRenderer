@@ -27,6 +27,8 @@ public:
 
     void drawImage(const Image* image);
 
+    void clear();
+
 private:
     Gpu() = default;
     ~Gpu() = default;

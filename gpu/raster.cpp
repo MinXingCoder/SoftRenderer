@@ -116,7 +116,7 @@ void Raster::interpolantTriangle(const Point& p0, const Point& p1, const Point& 
 {
     int p0p1_x = p1.x - p0.x, p0p1_y = p1.y - p0.y;
     int p0p2_x = p2.x - p0.x, p0p2_y = p2.y - p0.y;
-    int area = p0p1_x * p0p2_y - p0p1_y * p0p2_x;
+    int area = std::abs(p0p1_x * p0p2_y - p0p1_y * p0p2_x);
 
     int targetp1_x = p1.x - target.x, targetp1_y = p1.y - target.y;
     int targetp2_x = p2.x - target.x, targetp2_y = p2.y - target.y;

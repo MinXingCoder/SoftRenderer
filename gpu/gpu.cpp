@@ -78,3 +78,9 @@ void Gpu::drawImage(const Image* image)
         }
     }
 }
+
+void Gpu::clear()
+{
+    int array_size = m_width * m_height;
+    memset(m_buffer->getData(), 0, array_size * sizeof(RGBA));
+}

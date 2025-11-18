@@ -66,6 +66,8 @@ bool Application::initApplication(const int& width, const int& height, const std
         m_buffer = new FrameBuffer(width, height, nullptr);
     }
 
+    glDisable(GL_CULL_FACE);
+
     glGenTextures(1, &gImgTexture);
     glBindTexture(GL_TEXTURE_2D, gImgTexture);
 
